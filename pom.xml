@@ -2,10 +2,10 @@
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
 	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
 	<modelVersion>4.0.0</modelVersion>
-	<groupId>com.qbic.life</groupId>
-	<artifactId>templateQbicPortlet</artifactId>
+	<groupId>life.qbic</groupId>
+	<artifactId>portlet-base</artifactId>
 	<version>1.0</version>
-	<name>templateQbicPortlet</name>
+	<name>QBiC Portlet Template</name>
 
 	<properties>
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
@@ -25,6 +25,11 @@
 		<repository>
 			<id>vaadin-addons</id>
 			<url>http://maven.vaadin.com/vaadin-addons</url>
+		</repository>
+		<repository>
+			<id>nexusRelease</id>
+			<name>qbic release</name>
+			<url>https://peltzer.com.de/nexus/content/repositories/releases</url>
 		</repository>
 	</repositories>
 
@@ -106,7 +111,26 @@
 			<version>${liferay.version}</version>
 			<scope>provided</scope>
 		</dependency>
+
+		<dependency>
+			<groupId>life.qbic.openbis</groupId>
+			<artifactId>openbisclient</artifactId>
+			<version>1.1.1</version>
+		</dependency>
+
+		<dependency>
+			<groupId>life.qbic.openbis</groupId>
+			<artifactId>liferayandvaadinhelpers</artifactId>
+			<version>1.1.2</version>
+		</dependency>
+
+		<dependency>
+			<groupId>mysql</groupId>
+			<artifactId>mysql-connector-java</artifactId>
+			<version>5.1.6</version>
+		</dependency>
 	</dependencies>
+
 
 	<build>
 		<plugins>
