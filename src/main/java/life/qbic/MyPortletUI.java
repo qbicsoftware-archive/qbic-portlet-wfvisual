@@ -17,6 +17,7 @@ import com.vaadin.ui.Button.ClickEvent;
 import com.vaadin.ui.Label;
 import com.vaadin.ui.UI;
 import com.vaadin.ui.VerticalLayout;
+import life.qbic.portal.liferayandvaadinhelpers.main.LiferayAndVaadinUtils;
 
 @Theme("mytheme")
 @SuppressWarnings("serial")
@@ -33,17 +34,21 @@ public class MyPortletUI extends UI {
         layout.setMargin(true);
         setContent(layout);
 
+        String userID = "MISSING SCREENNAME";
+        if (LiferayAndVaadinUtils.isLiferayPortlet()) {
+            userID = LiferayAndVaadinUtils.getUser().getScreenName();
+        }
+        Label label = new Label(
+                "Hello, " + userID + "!<br>This is portlet "
+                        + portletContextName
+                        + ".<br>This portal has "
+                        + numOfRegisteredUsers
+                        + " registered users (according to the data returned by Liferay API call).",
+                ContentMode.HTML);
         final Button button = new Button("Click Me");
         button.addClickListener(new Button.ClickListener() {
             public void buttonClick(ClickEvent event) {
-                layout.addComponent(new Label(
-                        "Hello, World!<br>This is portlet "
-                                + portletContextName
-                                + ".<br>This portal has "
-                                + numOfRegisteredUsers
-                                + " registered users (according to the data returned by Liferay API call).",
-                        ContentMode.HTML));
-
+                layout.addComponent(label);
             }
         });
         layout.addComponent(button);
