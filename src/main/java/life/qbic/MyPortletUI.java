@@ -26,10 +26,12 @@ public class MyPortletUI extends UI {
 
     private static Log log = LogFactoryUtil.getLog(MyPortletUI.class);
 
+    private static Boolean testing = true;
+
     @Override
     protected void init(VaadinRequest request) {
-        final String portletContextName = getPortletContextName(request);
-        final Integer numOfRegisteredUsers = getPortalCountOfRegisteredUsers();
+        String portletContextName = "Testing";
+        Integer numOfRegisteredUsers = 1;
         final VerticalLayout layout = new VerticalLayout();
         layout.setMargin(true);
         setContent(layout);
@@ -39,6 +41,8 @@ public class MyPortletUI extends UI {
         String userID = "MISSING SCREENNAME";
         if (LiferayAndVaadinUtils.isLiferayPortlet()) {
             userID = LiferayAndVaadinUtils.getUser().getScreenName();
+            portletContextName = getPortletContextName(request);
+            numOfRegisteredUsers = getPortalCountOfRegisteredUsers();
         }
         Label label = new Label(
                 "Hello, " + userID + "!<br>This is portlet "
