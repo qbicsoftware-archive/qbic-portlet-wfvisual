@@ -34,6 +34,8 @@ public class MyPortletUI extends UI {
         layout.setMargin(true);
         setContent(layout);
 
+        final Button button = new Button("Test");
+
         String userID = "MISSING SCREENNAME";
         if (LiferayAndVaadinUtils.isLiferayPortlet()) {
             userID = LiferayAndVaadinUtils.getUser().getScreenName();
@@ -45,7 +47,7 @@ public class MyPortletUI extends UI {
                         + numOfRegisteredUsers
                         + " registered users (according to the data returned by Liferay API call).",
                 ContentMode.HTML);
-        final Button button = new Button("Click Me");
+
         button.addClickListener(new Button.ClickListener() {
             public void buttonClick(ClickEvent event) {
                 layout.addComponent(label);
