@@ -1,9 +1,7 @@
 package life.qbic;
 
-import com.vaadin.ui.Label;
-import com.vaadin.ui.OptionGroup;
-import com.vaadin.ui.TextField;
-import com.vaadin.ui.VerticalLayout;
+import com.vaadin.shared.ui.label.ContentMode;
+import com.vaadin.ui.*;
 
 /**
  * View that will display different barcode request cases for
@@ -23,22 +21,65 @@ public class BarcodeRequestViewImpl implements BarcodeRequestView{
 
     private VerticalLayout fullView;
 
+    private Button patientIdsampleIdButton;
+
+    private Panel patientIdField;
+
+    private Panel sampleIdPanel;
+
+    private Label patientIdLabel;
+
+    private Label sampleIdLabel;
+
     public BarcodeRequestViewImpl(){
         initView();
     }
 
     private void initView(){
+        // Init components
+        patientIdsampleIdButton = new Button("Get new Patient/Sample ID pair");
+        patientIdField = new Panel();
+        sampleIdPanel = new Panel();
         fullView = new VerticalLayout();
-        fullView.addComponent(new Label("It works"));
+        patientIdLabel = new Label("<i>ID will be displayed after request.</i>", ContentMode.HTML);
+        sampleIdLabel = new Label("<i>ID will be displayed after request.</i>", ContentMode.HTML);
+        HorizontalLayout panelContainer = new HorizontalLayout();
+
+        // Add components
+        panelContainer.addComponents(patientIdField, sampleIdPanel);
+        fullView.addComponent(new Label("<h1>UKT diagnostics ID request sheet</h1>", ContentMode.HTML));
+        fullView.addComponent(patientIdsampleIdButton);
+        fullView.addComponent(panelContainer);
+        fullView.setSpacing(true);
+
+
+        patientIdField.setCaption("Patient ID");
+        patientIdField.setWidth("300px");
+        sampleIdPanel.setCaption("Sample ID");
+        sampleIdPanel.setWidth("300px");
+        panelContainer.setSpacing(true);
+
+        VerticalLayout innerPatientIdLayout = new VerticalLayout();
+        innerPatientIdLayout.addComponent(patientIdLabel);
+        innerPatientIdLayout.setMargin(true);
+        patientIdField.setContent(innerPatientIdLayout);
+
+
+        VerticalLayout innerSampleIdLayout = new VerticalLayout();
+        innerSampleIdLayout.addComponent(sampleIdLabel);
+        innerSampleIdLayout.setMargin(true);
+        sampleIdPanel.setContent(innerSampleIdLayout);
+
+
     }
 
     @Override
-    public TextField getPatientIdField() {
-        return null;
+    public Panel getPatientIdField() {
+        return this.patientIdField;
     }
 
     @Override
-    public TextField getSampleIdField() {
+    public Panel getSampleIdField() {
         return null;
     }
 
@@ -50,5 +91,10 @@ public class BarcodeRequestViewImpl implements BarcodeRequestView{
     @Override
     public VerticalLayout getFullView() {
         return fullView;
+    }
+
+    @Override
+    public Button getPatentIdSampleIdButton() {
+        return this.patientIdsampleIdButton;
     }
 }
