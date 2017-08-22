@@ -1,14 +1,8 @@
 package life.qbic;
 
-import com.vaadin.ui.TextField;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
-import org.powermock.api.mockito.PowerMockito;
-
-import static org.junit.Assert.*;
-import static org.powermock.api.mockito.PowerMockito.mock;
-import static org.powermock.api.mockito.PowerMockito.when;
 
 public class BarcodeRequestPresenterTest {
 
