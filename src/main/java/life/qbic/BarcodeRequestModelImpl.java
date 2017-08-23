@@ -34,13 +34,18 @@ public class BarcodeRequestModelImpl implements BarcodeRequestModel{
         List<Sample> sampleList = openBisClient.getSamplesOfProject(PROJECTID);
         List<Sample> entities = getEntities(sampleList);
 
-        log.info(String.format("Number of non-entity samples: %s", sampleList.size() - entities.size()));
+        int numberOfNonEntitySamples = sampleList.size() - entities.size();
 
-        String barcode = createBarcodeFromInteger(sampleList.size() - entities.size());
+        String biologicalSampleCode = createBarcodeFromInteger(numberOfNonEntitySamples);
+        String testSampleCode = createBarcodeFromInteger(numberOfNonEntitySamples + 1);
+        String patientId = CODEPREFIX + "ENTITY-" + (entities.size() + 1);
 
+        idPair[0] = patientId;
+        idPair[1] = testSampleCode;
 
-        idPair[0] = barcode;
-        log.info(String.format("Barcode is %s", barcode));
+        log.debug(String.format("Number of non-entity samples: %s", numberOfNonEntitySamples));
+        log.info(String.format("New patient ID is %s", idPair[0]));
+        log.info(String.format("New sample ID is %s", idPair[1]));
 
         return idPair;
     }
