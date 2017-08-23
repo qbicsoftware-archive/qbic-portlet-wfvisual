@@ -74,13 +74,13 @@ public class BarcodeRequestViewImpl implements BarcodeRequestView{
     }
 
     @Override
-    public Panel getPatientIdField() {
-        return this.patientIdField;
+    public Label getPatientIdField() {
+        return this.patientIdLabel;
     }
 
     @Override
-    public Panel getSampleIdField() {
-        return null;
+    public Label getSampleIdField() {
+        return this.sampleIdLabel;
     }
 
     @Override

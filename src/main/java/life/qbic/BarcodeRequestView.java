@@ -8,13 +8,13 @@ public interface BarcodeRequestView {
      * Getter for the patientID text field
      * @return text field
      */
-    Panel getPatientIdField();
+    Label getPatientIdField();
 
     /**
      * Getter for the sampleID text field
      * @return text field
      */
-    Panel getSampleIdField();
+    Label getSampleIdField();
 
 
     /**

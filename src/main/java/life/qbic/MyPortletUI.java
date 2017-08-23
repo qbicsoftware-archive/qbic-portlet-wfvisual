@@ -60,7 +60,7 @@ public class MyPortletUI extends UI {
 
         final BarcodeRequestView requestView = new BarcodeRequestViewImpl();
         final BarcodeRequestModel barcodeRequestModel = new BarcodeRequestModelImpl(openBisClient);
-        final BarcodeRequestPresenter barcodeRequestPresenter = new BarcodeRequestPresenter(requestView);
+        final BarcodeRequestPresenter barcodeRequestPresenter = new BarcodeRequestPresenter(requestView, barcodeRequestModel);
 
         layout.addComponent(requestView.getFullView());
 
