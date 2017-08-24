@@ -43,14 +43,21 @@ public class BarcodeRequestModelImpl implements BarcodeRequestModel{
         idPair[0] = patientId;
         idPair[1] = testSampleCode;
 
+        // Logging code block
         log.debug(String.format("Number of non-entity samples: %s", numberOfNonEntitySamples));
-        log.info(String.format("New patient ID is %s", idPair[0]));
-        log.info(String.format("New sample ID is %s", idPair[1]));
+        log.info(String.format("%s: New patient ID is %s", AppInfo.getAppInfo(), idPair[0]));
+        log.info(String.format("%s: New sample ID is %s", AppInfo.getAppInfo(), idPair[1]));
 
         return idPair;
     }
 
 
+    /**
+     * Get a sample list with samples from type
+     * 'Q_BIOLOGICAL_ENTITY' from a list of samples
+     * @param sampleList The sample list to be filtered
+     * @return The filtered list
+     */
     private List<Sample> getEntities(List<Sample> sampleList){
         List<Sample> filteredList = new ArrayList<>();
 
@@ -64,6 +71,13 @@ public class BarcodeRequestModelImpl implements BarcodeRequestModel{
 
     }
 
+    /**
+     * Creates a complete barcode from a given number using
+     * the global project code prefix.
+     * Checksum calculation and barcode verification is included.
+     * @param number An integer number
+     * @return A fully formatted valid QBiC barcode
+     */
     private String createBarcodeFromInteger(int number){
         int multiplicator = number / 1000;
         char letter = ALPHABET[multiplicator];
