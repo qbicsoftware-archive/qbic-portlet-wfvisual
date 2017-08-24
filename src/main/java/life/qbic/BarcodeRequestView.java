@@ -41,9 +41,21 @@ public interface BarcodeRequestView {
 
 
     /**
-     * Method that will show the loading spinner on the UI
+     * Getter for the loading spinner
+     * @return The spinner
      */
     ProgressBar getSpinner();
 
+    /**
+     * Getter for the loading label
+     * @return The loading label
+     */
+    Label getLoadingLabel();
+
+    /**
+     * Get the container for spinner and label
+     * @return The container layout
+     */
+    HorizontalLayout getSpinnerContainer();
 
 }

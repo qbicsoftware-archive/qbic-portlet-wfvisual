@@ -33,6 +33,10 @@ public class BarcodeRequestViewImpl implements BarcodeRequestView {
 
     private ProgressBar spinner;
 
+    private Label loadingLabel;
+
+    private HorizontalLayout spinnerContainer;
+
     public BarcodeRequestViewImpl() {
         initView();
     }
@@ -40,6 +44,12 @@ public class BarcodeRequestViewImpl implements BarcodeRequestView {
     private void initView() {
         // Init components
         spinner = new ProgressBar();
+        loadingLabel = new Label();
+
+        spinnerContainer = new HorizontalLayout();
+        spinnerContainer.addComponents(spinner, loadingLabel);
+        spinnerContainer.setSpacing(true);
+
         patientIdsampleIdButton = new Button("Get new Patient/Sample ID pair");
         patientIdField = new Panel();
         sampleIdPanel = new Panel();
@@ -53,13 +63,13 @@ public class BarcodeRequestViewImpl implements BarcodeRequestView {
         fullView.addComponent(new Label("<h1>UKT diagnostics ID request sheet</h1>", ContentMode.HTML));
         fullView.addComponent(patientIdsampleIdButton);
         fullView.addComponent(panelContainer);
-        fullView.addComponent(spinner);
+        fullView.addComponent(spinnerContainer);
         fullView.setSpacing(true);
 
         // we want a spinner not a progress bar
         spinner.setIndeterminate(true);
         spinner.setImmediate(true);
-        spinner.setVisible(false);
+        spinnerContainer.setVisible(false);
 
         patientIdField.setCaption("Patient ID");
         patientIdField.setWidth("300px");
@@ -109,6 +119,16 @@ public class BarcodeRequestViewImpl implements BarcodeRequestView {
     @Override
     public ProgressBar getSpinner() {
         return this.spinner;
+    }
+
+    @Override
+    public Label getLoadingLabel() {
+        return this.loadingLabel;
+    }
+
+    @Override
+    public HorizontalLayout getSpinnerContainer() {
+        return this.spinnerContainer;
     }
 
 }
