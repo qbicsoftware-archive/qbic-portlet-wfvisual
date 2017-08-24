@@ -3,6 +3,7 @@ package life.qbic;
 import ch.systemsx.cisd.openbis.generic.shared.api.v1.dto.Sample;
 import com.liferay.portal.kernel.log.Log;
 import com.liferay.portal.kernel.log.LogFactoryUtil;
+import life.qbic.helpers.BarcodeFunctions;
 import life.qbic.helpers.Utils;
 import life.qbic.openbis.openbisclient.OpenBisClient;
 
@@ -89,7 +90,16 @@ public class BarcodeRequestModelImpl implements BarcodeRequestModel{
         }
 
         String preBarcode = CODEPREFIX + Utils.createCountString(remainingCounter, 3) + letter;
-        return preBarcode + checksum(preBarcode);
+
+        String barcode = preBarcode + checksum(preBarcode);
+
+        if (!BarcodeFunctions.isQbicBarcode(barcode)){
+            log.error(String.format("%s: Barcode created from Integer is not a valid barcode: %s", AppInfo.getAppInfo(),
+                    barcode));
+            barcode = "";
+        }
+
+        return barcode;
 
     }
 
