@@ -71,11 +71,48 @@ public class BarcodeRequestModelImpl implements BarcodeRequestModel{
      * @return True, if registration was successful, else false
      */
     private boolean registerNewPatient(String patientId, String biologicalSampleCode, String testSampleCode) {
-
-        registerEntity(patientId);
-        registerBioSample(biologicalSampleCode, "/"+SPACE+"/"+patientId);
+        if (registerEntity(patientId) &&
+                registerBioSample(biologicalSampleCode, "/"+SPACE+"/"+patientId) &&
+                registerTestSample(testSampleCode, "/"+SPACE+"/"+biologicalSampleCode)){
+            return true;
+        }
 
         return false;
+    }
+
+    /**
+     * Registration of a new test sample
+     * @param testSampleCode A code for the test sample type Q_TEST_SAMPLE
+     * @param parent A code for the parent sample type Q_BIOLOGICAL_SAMPLE
+     * @return True, if registration was successful, else false
+     */
+    private boolean registerTestSample(String testSampleCode, String parent) {
+        Map<String, Object> params = new HashMap<>();
+        Map<String, Object> map = new HashMap<>();
+        Map<String, Object> metadata = new HashMap<>();
+        List<String> parents = new ArrayList<>();
+
+        metadata.put("Q_SAMPLE_TYPE", "DNA");
+        parents.add(parent);
+
+        map.put("code", testSampleCode);
+        map.put("space", SPACE);
+        map.put("project", CODE);
+        map.put("experiment", CODE + "E3");
+        map.put("type", "Q_TEST_SAMPLE");
+        map.put("metadata", metadata);
+        map.put("parents", parents);
+
+        params.put(testSampleCode, map);
+
+        try{
+            openBisClient.ingest("DSS1", "register-sample-batch", params);
+        } catch (Exception exc){
+            log.error(exc);
+            return false;
+        }
+
+        return true;
     }
 
     /**
