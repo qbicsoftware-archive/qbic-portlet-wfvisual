@@ -15,17 +15,18 @@ public class BarcodeRequestPresenter {
 
     private String[] patientSampleIdPair;
 
-    public BarcodeRequestPresenter(BarcodeRequestView barcodeRequestView, BarcodeRequestModel barcodeRequestModel){
+    public BarcodeRequestPresenter(BarcodeRequestView barcodeRequestView, BarcodeRequestModel barcodeRequestModel) {
         this.barcodeRequestView = barcodeRequestView;
         this.barcodeRequestModel = barcodeRequestModel;
         giveLifeToElements();
     }
 
-    private void giveLifeToElements(){
+    private void giveLifeToElements() {
 
         barcodeRequestView.getPatentIdSampleIdButton().addClickListener(clickEvent -> {
             Thread request = new RequestThread(barcodeRequestView.getSpinner());
             request.start();
+            UI.getCurrent().setPollInterval(50);
         });
 
 
@@ -36,7 +37,7 @@ public class BarcodeRequestPresenter {
 
         ProgressBar bar;
 
-        public RequestThread(ProgressBar bar){
+        public RequestThread(ProgressBar bar) {
             this.bar = bar;
             bar.setVisible(true);
         }
@@ -44,22 +45,35 @@ public class BarcodeRequestPresenter {
         @Override
         public void run() {
 
-            UI.getCurrent().access(() -> bar.setVisible(true));
+
+            UI.getCurrent().access(() -> {
+                // Activate polling with 50ms interval
+                bar.setVisible(true);
+                barcodeRequestView.getPatentIdSampleIdButton().setEnabled(false);
+            });
 
             barcodeRequestModel.requestNewPatientSampleIdPair();
 
             patientSampleIdPair = barcodeRequestModel.getNewPatientSampleIdPair();
 
-            if (patientSampleIdPair == null){
+            if (patientSampleIdPair == null) {
                 Utils.Notification("Something went horribly wrong", "No barcodes created", "error");
             } else {
                 barcodeRequestView.getPatientIdField().setValue(patientSampleIdPair[0]);
                 barcodeRequestView.getSampleIdField().setValue(patientSampleIdPair[1]);
             }
 
-            UI.getCurrent().access(() -> bar.setVisible(false));
+            UI.getCurrent().access(() -> {
+                bar.setVisible(false);
+                barcodeRequestView.getPatentIdSampleIdButton().setEnabled(true);
+
+
+            });
+            // Stop polling
+            UI.getCurrent().setPollInterval(-1);
+
+
         }
+
     }
-
-
 }
