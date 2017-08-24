@@ -40,5 +40,10 @@ public interface BarcodeRequestView {
     Button getPatentIdSampleIdButton();
 
 
+    /**
+     * Method that will show the loading spinner on the UI
+     */
+    ProgressBar getSpinner();
+
 
 }

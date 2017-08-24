@@ -28,13 +28,15 @@ public class BarcodeRequestModelImpl implements BarcodeRequestModel{
 
     private static final char[] ALPHABET = "ABCDEFGHIJKLMNOPQRSTUVW".toCharArray();
 
+    private static String[] patientSampleIdPair= null;
+
     public BarcodeRequestModelImpl(OpenBisClient openBisClient){
         this.openBisClient = openBisClient;
     }
 
     @Override
-    public String[] getNewPatientSampleIdPair() {
-        String[] idPair = new String[2];
+    public void requestNewPatientSampleIdPair() {
+        patientSampleIdPair = new String[2];
 
         List<Sample> sampleList = openBisClient.getSamplesOfProject(PROJECTID);
         List<Sample> entities = getEntities(sampleList);
@@ -48,19 +50,23 @@ public class BarcodeRequestModelImpl implements BarcodeRequestModel{
         String testSampleCode = createBarcodeFromInteger(numberOfNonEntitySamples + 3);
         String patientId = CODE + "ENTITY-" + (entities.size() + 1);
 
-        idPair[0] = patientId;
-        idPair[1] = testSampleCode;
+        patientSampleIdPair[0] = patientId;
+        patientSampleIdPair[1] = testSampleCode;
 
         // Logging code block
         log.debug(String.format("Number of non-entity samples: %s", numberOfNonEntitySamples));
-        log.info(String.format("%s: New patient ID created %s", AppInfo.getAppInfo(), idPair[0]));
-        log.info(String.format("%s: New sample ID created %s", AppInfo.getAppInfo(), idPair[1]));
+        log.info(String.format("%s: New patient ID created %s", AppInfo.getAppInfo(), patientSampleIdPair[0]));
+        log.info(String.format("%s: New sample ID created %s", AppInfo.getAppInfo(), patientSampleIdPair[1]));
 
         // In case registration fails, return null
         if(!registerNewPatient(patientId, biologicalSampleCode, testSampleCode))
-            return null;
+            patientSampleIdPair = null;
 
-        return idPair;
+    }
+
+    @Override
+    public String[] getNewPatientSampleIdPair() {
+        return patientSampleIdPair;
     }
 
     /**

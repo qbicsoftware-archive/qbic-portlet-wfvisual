@@ -38,6 +38,7 @@ public class MyPortletUI extends UI {
 
     @Override
     protected void init(VaadinRequest request) {
+        UI.getCurrent().setPollInterval( 500 );
         String portletContextName = "Testing";
         Integer numOfRegisteredUsers = 1;
         final VerticalLayout layout = new VerticalLayout();

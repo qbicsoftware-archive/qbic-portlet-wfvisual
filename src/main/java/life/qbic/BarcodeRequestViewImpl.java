@@ -15,7 +15,7 @@ import com.vaadin.ui.*;
  *     Use case: Repeated NGS run on the same tissue.
  *
  */
-public class BarcodeRequestViewImpl implements BarcodeRequestView{
+public class BarcodeRequestViewImpl implements BarcodeRequestView {
 
     private OptionGroup taskSelection;
 
@@ -31,12 +31,15 @@ public class BarcodeRequestViewImpl implements BarcodeRequestView{
 
     private Label sampleIdLabel;
 
-    public BarcodeRequestViewImpl(){
+    private ProgressBar spinner;
+
+    public BarcodeRequestViewImpl() {
         initView();
     }
 
-    private void initView(){
+    private void initView() {
         // Init components
+        spinner = new ProgressBar();
         patientIdsampleIdButton = new Button("Get new Patient/Sample ID pair");
         patientIdField = new Panel();
         sampleIdPanel = new Panel();
@@ -50,8 +53,13 @@ public class BarcodeRequestViewImpl implements BarcodeRequestView{
         fullView.addComponent(new Label("<h1>UKT diagnostics ID request sheet</h1>", ContentMode.HTML));
         fullView.addComponent(patientIdsampleIdButton);
         fullView.addComponent(panelContainer);
+        fullView.addComponent(spinner);
         fullView.setSpacing(true);
 
+        // we want a spinner not a progress bar
+        spinner.setIndeterminate(true);
+        spinner.setImmediate(true);
+        spinner.setVisible(false);
 
         patientIdField.setCaption("Patient ID");
         patientIdField.setWidth("300px");
@@ -97,4 +105,10 @@ public class BarcodeRequestViewImpl implements BarcodeRequestView{
     public Button getPatentIdSampleIdButton() {
         return this.patientIdsampleIdButton;
     }
+
+    @Override
+    public ProgressBar getSpinner() {
+        return this.spinner;
+    }
+
 }
