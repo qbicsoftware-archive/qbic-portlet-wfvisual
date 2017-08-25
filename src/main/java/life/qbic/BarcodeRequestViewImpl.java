@@ -1,5 +1,8 @@
 package life.qbic;
 
+import com.vaadin.client.ui.Icon;
+import com.vaadin.server.FontAwesome;
+import com.vaadin.server.Sizeable;
 import com.vaadin.shared.ui.label.ContentMode;
 import com.vaadin.ui.*;
 
@@ -43,6 +46,14 @@ public class BarcodeRequestViewImpl implements BarcodeRequestView {
 
     private VerticalLayout taskCreateSampleContainer;
 
+    private TextField patientIdInputField;
+
+    private Label newSampleIdLabel;
+
+    private Panel newPatientIdPanel;
+
+    private Panel newSampleIdPanel;
+
     public BarcodeRequestViewImpl() {
         initView();
     }
@@ -50,6 +61,11 @@ public class BarcodeRequestViewImpl implements BarcodeRequestView {
     private void initView() {
         // Init components
         createTaskSelectionView();
+        patientIdInputField = new TextField();
+        patientIdInputField.setValue("Enter patient ID here");
+        newSampleIdLabel = new Label("<i>ID will be displayed after request.</i>", ContentMode.HTML);
+        newPatientIdPanel = new Panel("Patient ID");
+        newSampleIdPanel = new Panel("Sample ID");
         spinner = new ProgressBar();
         loadingLabel = new Label();
         taskCreatePatientContainer = new VerticalLayout();
@@ -67,9 +83,11 @@ public class BarcodeRequestViewImpl implements BarcodeRequestView {
         patientIdLabel = new Label("<i>ID will be displayed after request.</i>", ContentMode.HTML);
         sampleIdLabel = new Label("<i>ID will be displayed after request.</i>", ContentMode.HTML);
         HorizontalLayout panelContainer = new HorizontalLayout();
+        HorizontalLayout panelContainerTask2 = new HorizontalLayout();
 
         // Add components
         panelContainer.addComponents(patientIdField, sampleIdPanel);
+        panelContainerTask2.addComponents(newPatientIdPanel, newSampleIdPanel);
         fullView.addComponent(new Label("<h1>UKT diagnostics ID request sheet</h1>", ContentMode.HTML));
 
         // Compose new patient request layout form
@@ -78,7 +96,7 @@ public class BarcodeRequestViewImpl implements BarcodeRequestView {
         taskCreatePatientContainer.setVisible(false);
 
         // Compose new sample request layout form;
-        taskCreateSampleContainer.addComponents(createSampleForPatientButton);
+        taskCreateSampleContainer.addComponents(createSampleForPatientButton, panelContainerTask2);
         taskCreateSampleContainer.setSpacing(true);
         taskCreateSampleContainer.setVisible(false);
 
@@ -97,17 +115,37 @@ public class BarcodeRequestViewImpl implements BarcodeRequestView {
         sampleIdPanel.setWidth("300px");
         panelContainer.setSpacing(true);
 
+        newPatientIdPanel.setWidth("300px");
+        newSampleIdPanel.setWidth("300px");
+        panelContainerTask2.setSpacing(true);
+
         VerticalLayout innerPatientIdLayout = new VerticalLayout();
         innerPatientIdLayout.addComponent(patientIdLabel);
         innerPatientIdLayout.setMargin(true);
         patientIdField.setContent(innerPatientIdLayout);
+        patientIdField.setIcon(FontAwesome.USER);
 
 
         VerticalLayout innerSampleIdLayout = new VerticalLayout();
         innerSampleIdLayout.addComponent(sampleIdLabel);
         innerSampleIdLayout.setMargin(true);
         sampleIdPanel.setContent(innerSampleIdLayout);
+        sampleIdPanel.setIcon(FontAwesome.FILE_O);
 
+        VerticalLayout innerPatientIdLayoutTask2 = new VerticalLayout();
+        innerPatientIdLayoutTask2.addComponent(patientIdInputField);
+        innerPatientIdLayoutTask2.setMargin(true);
+        newPatientIdPanel.setContent(innerPatientIdLayoutTask2);
+        newPatientIdPanel.setIcon(FontAwesome.USER);
+
+        VerticalLayout innerSampleIdLayoutTask2 = new VerticalLayout();
+        innerSampleIdLayoutTask2.addComponent(newSampleIdLabel);
+        innerSampleIdLayoutTask2.setMargin(true);
+        innerSampleIdLayoutTask2.setComponentAlignment(newSampleIdLabel, Alignment.MIDDLE_LEFT);
+        innerPatientIdLayoutTask2.setHeight(100, Sizeable.Unit.PERCENTAGE);
+        newSampleIdPanel.setContent(innerSampleIdLayoutTask2);
+        newSampleIdPanel.setHeight(100, Sizeable.Unit.PERCENTAGE);
+        newSampleIdPanel.setIcon(FontAwesome.FILE_O);
 
     }
 
@@ -170,6 +208,16 @@ public class BarcodeRequestViewImpl implements BarcodeRequestView {
     @Override
     public Button getCreateSampleButton() {
         return this.createSampleForPatientButton;
+    }
+
+    @Override
+    public TextField patientIdInputField() {
+        return null;
+    }
+
+    @Override
+    public Label getNewSampleIdField() {
+        return null;
     }
 
 }

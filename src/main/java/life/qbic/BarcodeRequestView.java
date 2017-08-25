@@ -76,4 +76,16 @@ public interface BarcodeRequestView {
      */
     Button getCreateSampleButton();
 
+    /**
+     * Getter for the patient ID input field
+     * @return The text field
+     */
+    TextField patientIdInputField();
+
+    /**
+     * Getter for the sample ID field
+     * @return The label
+     */
+    Label getNewSampleIdField();
+
 }
