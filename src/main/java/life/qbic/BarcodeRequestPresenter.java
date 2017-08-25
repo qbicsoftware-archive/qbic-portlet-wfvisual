@@ -25,6 +25,16 @@ public class BarcodeRequestPresenter {
 
     private void giveLifeToElements() {
 
+        barcodeRequestView.getTaskSelectionGroup().addValueChangeListener(value -> {
+            if(barcodeRequestView.getTaskSelectionGroup().getValue().toString().contains("patient/sample")) {
+                barcodeRequestView.getCreatePatientContainer().setVisible(true);
+                barcodeRequestView.getCreateSampleContainer().setVisible(false);
+            } else{
+                barcodeRequestView.getCreatePatientContainer().setVisible(false);
+                barcodeRequestView.getCreateSampleContainer().setVisible(true);
+            }
+        });
+
         barcodeRequestView.getPatentIdSampleIdButton().addClickListener(clickEvent -> {
             Thread request = new RequestThread();
             request.start();

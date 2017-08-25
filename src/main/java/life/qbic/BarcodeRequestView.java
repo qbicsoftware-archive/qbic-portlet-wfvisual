@@ -58,4 +58,22 @@ public interface BarcodeRequestView {
      */
     HorizontalLayout getSpinnerContainer();
 
+    /**
+     * Getter for the CreatePatientContainer
+     * @return The container
+     */
+    VerticalLayout getCreatePatientContainer();
+
+    /**
+     * Getter for the CreateSampleContainer
+     * @return The container
+     */
+    VerticalLayout getCreateSampleContainer();
+
+    /**
+     * Getter for the create sample button
+     * @return The button
+     */
+    Button getCreateSampleButton();
+
 }
