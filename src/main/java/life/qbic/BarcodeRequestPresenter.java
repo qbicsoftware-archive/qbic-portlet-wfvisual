@@ -6,6 +6,7 @@ import com.vaadin.ui.HorizontalLayout;
 import com.vaadin.ui.Label;
 import com.vaadin.ui.ProgressBar;
 import com.vaadin.ui.UI;
+import com.vaadin.ui.themes.ValoTheme;
 import life.qbic.helpers.Utils;
 
 public class BarcodeRequestPresenter {
@@ -42,6 +43,12 @@ public class BarcodeRequestPresenter {
         });
 
 
+        barcodeRequestView.getCreateSampleButton().addClickListener(clickEvent -> {
+            Thread request = new NewSampleRequestThread();
+            request.start();
+            UI.getCurrent().setPollInterval(50);
+        });
+
     }
 
     /**
@@ -63,6 +70,8 @@ public class BarcodeRequestPresenter {
 
         @Override
         public void run() {
+            UI.getCurrent().getSession().lock();
+
             // Thread-safe UI access
             UI.getCurrent().access(() -> {
                 container.setVisible(true);
@@ -88,6 +97,54 @@ public class BarcodeRequestPresenter {
 
             // Stop polling
             UI.getCurrent().setPollInterval(-1);
+
+            UI.getCurrent().getSession().unlock();
         }
+    }
+
+
+    class NewSampleRequestThread extends Thread {
+        ProgressBar bar;
+        HorizontalLayout loadingInfoContainer;
+        Label loadingLabel;
+
+        public NewSampleRequestThread(){
+            this.bar = barcodeRequestView.getSpinner();
+            this.loadingLabel = barcodeRequestView.getLoadingLabel();
+            this.loadingInfoContainer = barcodeRequestView.getSpinnerContainer();
+        }
+
+        @Override
+        public void run() {
+
+            UI.getCurrent().getSession().lock();
+
+            UI.getCurrent().access(() -> {
+               loadingInfoContainer.setVisible(true);
+               loadingLabel.setValue("Check if patient ID is valid ...");
+               barcodeRequestView.getCreateSampleButton().setEnabled(false);
+            });
+
+            if (barcodeRequestView.getPatientIdField().getValue().isEmpty() ||
+                    barcodeRequestView.getPatientIdField().getValue().trim().contains(" ")){
+                Utils.Notification("Wrong/missing patient ID",
+                        "Please enter a valid patient ID (like Q****ENTITY-1", "error");
+                log.error("Wrong or empty patient ID");
+                barcodeRequestView.patientIdInputField().addStyleName("textfield-red");
+            }
+
+            //barcodeRequestModel.checkIfPatientExists()
+
+            UI.getCurrent().access(() -> {
+                loadingInfoContainer.setVisible(false);
+                barcodeRequestView.getCreateSampleButton().setEnabled(true);
+            });
+
+            UI.getCurrent().setPollInterval(-1);
+
+            UI.getCurrent().getSession().unlock();
+        }
+
+
     }
 }

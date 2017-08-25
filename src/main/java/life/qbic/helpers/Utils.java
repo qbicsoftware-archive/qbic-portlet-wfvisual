@@ -277,15 +277,15 @@ public class Utils {
         Notification notify = new Notification(title, description);
         notify.setPosition(Position.TOP_CENTER);
         if (type.equals("error")) {
-            notify.setDelayMsec(16000);
+            notify.setDelayMsec(3000);
             notify.setIcon(FontAwesome.FROWN_O);
             notify.setStyleName(ValoTheme.NOTIFICATION_ERROR + " " + ValoTheme.NOTIFICATION_CLOSABLE);
         } else if (type.equals("success")) {
-            notify.setDelayMsec(8000);
+            notify.setDelayMsec(3000);
             notify.setIcon(FontAwesome.SMILE_O);
             notify.setStyleName(ValoTheme.NOTIFICATION_SUCCESS + " " + ValoTheme.NOTIFICATION_CLOSABLE);
         } else {
-            notify.setDelayMsec(8000);
+            notify.setDelayMsec(3000);
             notify.setIcon(FontAwesome.COMMENT);
             notify.setStyleName(ValoTheme.NOTIFICATION_TRAY + " " + ValoTheme.NOTIFICATION_CLOSABLE);
         }

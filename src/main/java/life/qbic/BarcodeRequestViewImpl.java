@@ -212,7 +212,7 @@ public class BarcodeRequestViewImpl implements BarcodeRequestView {
 
     @Override
     public TextField patientIdInputField() {
-        return null;
+        return this.patientIdInputField;
     }
 
     @Override
