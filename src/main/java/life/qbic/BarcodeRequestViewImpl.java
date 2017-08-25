@@ -7,11 +7,11 @@ import com.vaadin.ui.*;
  * View that will display different barcode request cases for
  * the UKT diagnostics scenario:
  *
- *  1) Request new patientID/extractID pair
+ *  1) Request new patientID/sampleID pair
  *     Use case: A new patient will be added to CentraXX and a new
  *     ID tuple is needed.
  *
- *  2) Request new extractID for already existing patientID
+ *  2) Request new sampleID for already existing patientID
  *     Use case: Repeated NGS run on the same tissue.
  *
  */
