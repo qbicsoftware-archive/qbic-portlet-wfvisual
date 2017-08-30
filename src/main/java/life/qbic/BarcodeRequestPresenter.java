@@ -6,7 +6,6 @@ import com.vaadin.ui.HorizontalLayout;
 import com.vaadin.ui.Label;
 import com.vaadin.ui.ProgressBar;
 import com.vaadin.ui.UI;
-import com.vaadin.ui.themes.ValoTheme;
 import life.qbic.helpers.Utils;
 
 public class BarcodeRequestPresenter {
@@ -117,6 +116,8 @@ public class BarcodeRequestPresenter {
         @Override
         public void run() {
 
+            String patientID =
+                    barcodeRequestView.getPatientIdInputField().getValue().trim();
             UI.getCurrent().getSession().lock();
 
             UI.getCurrent().access(() -> {
@@ -126,14 +127,24 @@ public class BarcodeRequestPresenter {
             });
 
             if (barcodeRequestView.getPatientIdField().getValue().isEmpty() ||
-                    barcodeRequestView.getPatientIdField().getValue().trim().contains(" ")){
+                    patientID.contains(" ")){
                 Utils.Notification("Wrong/missing patient ID",
                         "Please enter a valid patient ID (like Q****ENTITY-1", "error");
-                log.error("Wrong or empty patient ID");
-                barcodeRequestView.patientIdInputField().addStyleName("textfield-red");
+                log.error("Wrong or empty patient ID " + patientID);
+                barcodeRequestView.getPatientIdInputField().addStyleName("textfield-red");
+            } else {
+                if(!barcodeRequestModel.checkIfPatientExists(patientID)){
+                    Utils.Notification("Patient ID does not exist yet.",
+                            "Please request a new patient/sample pair (Selection 1)", "error");
+                    log.error("Patient with ID " + patientID + " could not be found!");
+                    barcodeRequestView.getPatientIdInputField().addStyleName("textfield-red");
+                } else {
+                    barcodeRequestView.getPatientIdInputField().removeStyleName("textfield-red");
+                    barcodeRequestView.getPatientIdInputField().addStyleName("textfield-green");
+                }
             }
 
-            //barcodeRequestModel.checkIfPatientExists()
+
 
             UI.getCurrent().access(() -> {
                 loadingInfoContainer.setVisible(false);

@@ -18,4 +18,10 @@ public interface BarcodeRequestModel {
      */
     String[] getNewPatientSampleIdPair();
 
+    /**
+     * Make a request to openBIS with a Q_BIOLOGICAL_ENTITY
+     * ID
+     * @return True, if sample with ID exists, else false
+     */
+    boolean checkIfPatientExists(String sampleID);
 }

@@ -211,7 +211,7 @@ public class BarcodeRequestViewImpl implements BarcodeRequestView {
     }
 
     @Override
-    public TextField patientIdInputField() {
+    public TextField getPatientIdInputField() {
         return this.patientIdInputField;
     }
 

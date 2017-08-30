@@ -69,6 +69,18 @@ public class BarcodeRequestModelImpl implements BarcodeRequestModel{
         return patientSampleIdPair;
     }
 
+    @Override
+    public boolean checkIfPatientExists(String sampleID) {
+        Sample sample;
+        try{
+            sample = openBisClient.getSampleByIdentifier("/" + SPACE + "/" + sampleID);
+        } catch (Exception exc){
+            log.error(exc);
+            return false;
+        }
+        return sample != null;
+    }
+
     /**
      * Registration of a new patient with samples
      * @param patientId A code for the sample type Q_BIOLOGICAL_ENTITY
