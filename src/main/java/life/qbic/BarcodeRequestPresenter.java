@@ -36,6 +36,7 @@ public class BarcodeRequestPresenter {
         });
 
         barcodeRequestView.getPatentIdSampleIdButton().addClickListener(clickEvent -> {
+            barcodeRequestView.getPatentIdSampleIdButton().setEnabled(false);
             Thread request = new RequestThread();
             request.start();
             UI.getCurrent().setPollInterval(50);
@@ -43,6 +44,7 @@ public class BarcodeRequestPresenter {
 
 
         barcodeRequestView.getCreateSampleButton().addClickListener(clickEvent -> {
+            barcodeRequestView.getCreateSampleButton().setEnabled(false);
             Thread request = new NewSampleRequestThread();
             request.start();
             UI.getCurrent().setPollInterval(50);
@@ -64,19 +66,20 @@ public class BarcodeRequestPresenter {
             this.bar = barcodeRequestView.getSpinner();
             this.loadingLabel = barcodeRequestView.getLoadingLabel();
             this.container = barcodeRequestView.getSpinnerContainer();
-            bar.setVisible(true);
+            container.setVisible(true);
         }
 
         @Override
         public void run() {
-            UI.getCurrent().getSession().lock();
+
 
             // Thread-safe UI access
             UI.getCurrent().access(() -> {
                 container.setVisible(true);
                 loadingLabel.setValue("Patient and Sample IDs are requested ...");
-                barcodeRequestView.getPatentIdSampleIdButton().setEnabled(false);
             });
+
+            //UI.getCurrent().getSession().lock();
 
             barcodeRequestModel.requestNewPatientSampleIdPair();
 
@@ -97,7 +100,7 @@ public class BarcodeRequestPresenter {
             // Stop polling
             UI.getCurrent().setPollInterval(-1);
 
-            UI.getCurrent().getSession().unlock();
+            //UI.getCurrent().getSession().unlock();
         }
     }
 
@@ -111,6 +114,7 @@ public class BarcodeRequestPresenter {
             this.bar = barcodeRequestView.getSpinner();
             this.loadingLabel = barcodeRequestView.getLoadingLabel();
             this.loadingInfoContainer = barcodeRequestView.getSpinnerContainer();
+            loadingInfoContainer.setVisible(true);
         }
 
         @Override
@@ -118,12 +122,11 @@ public class BarcodeRequestPresenter {
 
             String patientID =
                     barcodeRequestView.getPatientIdInputField().getValue().trim();
-            UI.getCurrent().getSession().lock();
+            //UI.getCurrent().getSession().lock();
 
             UI.getCurrent().access(() -> {
-               loadingInfoContainer.setVisible(true);
                loadingLabel.setValue("Check if patient ID is valid ...");
-               barcodeRequestView.getCreateSampleButton().setEnabled(false);
+
             });
 
             if (barcodeRequestView.getPatientIdField().getValue().isEmpty() ||
@@ -134,17 +137,25 @@ public class BarcodeRequestPresenter {
                 barcodeRequestView.getPatientIdInputField().addStyleName("textfield-red");
             } else {
                 if(!barcodeRequestModel.checkIfPatientExists(patientID)){
+                    loadingLabel.setValue("No patient with that ID was found.");
                     Utils.Notification("Patient ID does not exist yet.",
                             "Please request a new patient/sample pair (Selection 1)", "error");
                     log.error("Patient with ID " + patientID + " could not be found!");
                     barcodeRequestView.getPatientIdInputField().addStyleName("textfield-red");
                 } else {
+                    loadingLabel.setValue("Patient found, creating and registering new sample ...");
                     barcodeRequestView.getPatientIdInputField().removeStyleName("textfield-red");
-                    barcodeRequestView.getPatientIdInputField().addStyleName("textfield-green");
+                    String sampleCode = barcodeRequestModel.addNewSampleToPatient(patientID);
+                    if(sampleCode.isEmpty()){
+                        Utils.Notification("Sample registration error",
+                                "Please contact us via helpdesk@qbic.uni-tuebingen.de",
+                                "error");
+                    } else{
+                        log.info(String.format("Determined new sample barcode for patient %s: %s", patientID, sampleCode));
+                        barcodeRequestView.getNewSampleIdField().setValue(sampleCode);
+                    }
                 }
             }
-
-
 
             UI.getCurrent().access(() -> {
                 loadingInfoContainer.setVisible(false);
@@ -153,7 +164,7 @@ public class BarcodeRequestPresenter {
 
             UI.getCurrent().setPollInterval(-1);
 
-            UI.getCurrent().getSession().unlock();
+            //UI.getCurrent().getSession().unlock();
         }
 
 

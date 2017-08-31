@@ -1,6 +1,7 @@
 package life.qbic;
 
 import ch.systemsx.cisd.openbis.generic.shared.api.v1.dto.Sample;
+import ch.systemsx.cisd.openbis.generic.shared.api.v1.dto.SearchCriteria;
 import com.liferay.portal.kernel.log.Log;
 import com.liferay.portal.kernel.log.LogFactoryUtil;
 import life.qbic.helpers.BarcodeFunctions;
@@ -11,6 +12,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.stream.Collectors;
 
 import static life.qbic.helpers.BarcodeFunctions.checksum;
 
@@ -38,23 +40,20 @@ public class BarcodeRequestModelImpl implements BarcodeRequestModel{
     public void requestNewPatientSampleIdPair() {
         patientSampleIdPair = new String[2];
 
-        List<Sample> sampleList = openBisClient.getSamplesOfProject(PROJECTID);
-        List<Sample> entities = getEntities(sampleList);
-
-        int numberOfNonEntitySamples = sampleList.size() - entities.size();
+        int[] sizes = getNumberOfSampleTypes();
 
         // offset is +2, because there is always an attachment sample per project
-        String biologicalSampleCode = createBarcodeFromInteger(numberOfNonEntitySamples + 2 );
+        String biologicalSampleCode = createBarcodeFromInteger(sizes[0] + 2 );
 
         // offset is +3, because of the previous created sample and the attachement
-        String testSampleCode = createBarcodeFromInteger(numberOfNonEntitySamples + 3);
-        String patientId = CODE + "ENTITY-" + (entities.size() + 1);
+        String testSampleCode = createBarcodeFromInteger(sizes[0] + 3);
+        String patientId = CODE + "ENTITY-" + (sizes[1] + 1);
 
         patientSampleIdPair[0] = patientId;
         patientSampleIdPair[1] = testSampleCode;
 
         // Logging code block
-        log.debug(String.format("Number of non-entity samples: %s", numberOfNonEntitySamples));
+        log.debug(String.format("Number of non-entity samples: %s", sizes[0]));
         log.info(String.format("%s: New patient ID created %s", AppInfo.getAppInfo(), patientSampleIdPair[0]));
         log.info(String.format("%s: New sample ID created %s", AppInfo.getAppInfo(), patientSampleIdPair[1]));
 
@@ -62,6 +61,26 @@ public class BarcodeRequestModelImpl implements BarcodeRequestModel{
         if(!registerNewPatient(patientId, biologicalSampleCode, testSampleCode))
             patientSampleIdPair = null;
 
+    }
+
+
+    /**
+     * Determines the number of non entity samples and
+     * total samples for a project
+     * @return An 1D array with 2 entries:
+     *          array[0] = number of non entities
+     *          array[1] = number of total entities
+     */
+    private int[] getNumberOfSampleTypes(){
+        int[] sizes = new int[2];
+        List<Sample> sampleList = openBisClient.getSamplesOfProject(PROJECTID);
+        List<Sample> entities = getEntities(sampleList);
+
+        int nonEntitySamples = sampleList.size() - entities.size();
+
+        sizes[0] = nonEntitySamples;
+        sizes[1] = entities.size();
+        return sizes;
     }
 
     @Override
@@ -79,6 +98,44 @@ public class BarcodeRequestModelImpl implements BarcodeRequestModel{
             return false;
         }
         return sample != null;
+    }
+
+    @Override
+    public String addNewSampleToPatient(String patientID) {
+        List<Sample> sampleList = openBisClient.getSamplesWithParentsAndChildren(patientID).get(0).getChildren();
+
+        if (sampleList.size() == 0){
+            log.error(String.format("Sample list was empty, patient ID %s seems to have no parents or childrens", patientID));
+            return "";
+        }
+
+        List<Sample> biologicalSamplesOnly = sampleList.stream().filter(sample -> sample.getSampleTypeCode()
+                .equals("Q_BIOLOGICAL_SAMPLE"))
+                .collect(Collectors.toList());
+
+        int size = biologicalSamplesOnly.size();
+
+        if (size == 0){
+            log.error(String.format("No samples of type 'Q_BIOLOGICAL_SAMPLE' found for patient ID %s.", patientID));
+            return "";
+        } else if (size > 1){
+            log.error(String.format("More than 1 sample of type 'Q_BIOLOGICAL_SAMPLE' found for patient ID %s.", patientID));
+            return "";
+        }
+
+        int i = getNumberOfSampleTypes()[0];
+
+        String sampleBarcode = createBarcodeFromInteger(getNumberOfSampleTypes()[0] + 2);
+
+        if (sampleBarcode.isEmpty()){
+            log.error("Retrieval of a new sample barcode failed. No new sample for an existing patient " +
+                    "was created.");
+            return "";
+        }
+
+        boolean sampleRegistrationWasSuccessfull = registerTestSample(sampleBarcode, biologicalSamplesOnly.get(0).getCode());
+
+        return sampleRegistrationWasSuccessfull ? sampleBarcode : "";
     }
 
     /**
@@ -235,7 +292,7 @@ public class BarcodeRequestModelImpl implements BarcodeRequestModel{
         int remainingCounter = number - multiplicator*1000;
 
         if (remainingCounter > 999 || remainingCounter < 0){
-            return null;
+            return "";
         }
 
         String preBarcode = CODE + Utils.createCountString(remainingCounter, 3) + letter;

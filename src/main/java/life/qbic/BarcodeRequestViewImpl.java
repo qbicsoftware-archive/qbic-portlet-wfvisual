@@ -217,7 +217,7 @@ public class BarcodeRequestViewImpl implements BarcodeRequestView {
 
     @Override
     public Label getNewSampleIdField() {
-        return null;
+        return this.newSampleIdLabel;
     }
 
 }
