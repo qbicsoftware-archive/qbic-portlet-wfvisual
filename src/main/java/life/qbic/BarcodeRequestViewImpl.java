@@ -152,7 +152,7 @@ public class BarcodeRequestViewImpl implements BarcodeRequestView {
     private void createTaskSelectionView() {
         taskSelection = new OptionGroup("Choose what you want to do");
         taskSelection.addItems("Request new patient/sample ID pair (Creates new patient ID!)",
-                "Add sample to an existing patient");
+                "Create new DNA sample for an existing patient");
     }
 
     @Override
