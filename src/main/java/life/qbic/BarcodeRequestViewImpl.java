@@ -62,6 +62,7 @@ public class BarcodeRequestViewImpl implements BarcodeRequestView {
         // Init components
         createTaskSelectionView();
         patientIdInputField = new ComboBox();
+        patientIdInputField.setWidth("100%");
         patientIdInputField.setValue("Enter patient ID here");
         newSampleIdLabel = new Label("<i>ID will be displayed after request.</i>", ContentMode.HTML);
         newPatientIdPanel = new Panel("Patient ID");

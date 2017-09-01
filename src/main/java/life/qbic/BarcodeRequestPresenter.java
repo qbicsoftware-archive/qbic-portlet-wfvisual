@@ -84,14 +84,14 @@ public class BarcodeRequestPresenter {
                 loadingLabel.setValue("Patient and Sample IDs are requested ...");
             });
 
-            //UI.getCurrent().getSession().lock();
 
             barcodeRequestModel.requestNewPatientSampleIdPair();
 
             patientSampleIdPair = barcodeRequestModel.getNewPatientSampleIdPair();
 
             if (patientSampleIdPair == null) {
-                Utils.Notification("Something went horribly wrong", "No barcodes created", "error");
+               UI.getCurrent().access(() ->
+                       Utils.Notification("Something went horribly wrong", "No barcodes created", "error"));
             } else {
                 barcodeRequestView.getPatientIdField().setValue(patientSampleIdPair[0]);
                 barcodeRequestView.getSampleIdField().setValue(patientSampleIdPair[1]);
@@ -105,7 +105,6 @@ public class BarcodeRequestPresenter {
             // Stop polling
             UI.getCurrent().setPollInterval(-1);
 
-            //UI.getCurrent().getSession().unlock();
         }
     }
 
@@ -126,25 +125,27 @@ public class BarcodeRequestPresenter {
         public void run() {
 
             String patientID =
-                    barcodeRequestView.getPatientIdInputField().getInputPrompt().trim();
-            //UI.getCurrent().getSession().lock();
+                    barcodeRequestView.getPatientIdInputField().getValue().toString().trim();
+            log.info("Selection: " + patientID);
 
-            UI.getCurrent().access(() -> {
-               loadingLabel.setValue("Check if patient ID is valid ...");
 
-            });
+            UI.getCurrent().access(()->
+                loadingLabel.setValue("Check if patient ID is valid ..."));
+
 
             if (barcodeRequestView.getPatientIdField().getValue().isEmpty() ||
                     patientID.contains(" ")){
-                Utils.Notification("Wrong/missing patient ID",
-                        "Please enter a valid patient ID (like Q****ENTITY-1", "error");
+                UI.getCurrent().access(() -> Utils.Notification("Wrong/missing patient ID",
+                        "Please enter a valid patient ID (like Q****ENTITY-1", "error"));
                 log.error("Wrong or empty patient ID " + patientID);
                 barcodeRequestView.getPatientIdInputField().addStyleName("textfield-red");
             } else {
                 if(!barcodeRequestModel.checkIfPatientExists(patientID)){
                     loadingLabel.setValue("No patient with that ID was found.");
-                    Utils.Notification("Patient ID does not exist yet.",
-                            "Please request a new patient/sample pair (Selection 1)", "error");
+
+                    UI.getCurrent().access(() ->
+                        Utils.Notification("Patient ID does not exist yet.",
+                                "Please request a new patient/sample pair (Selection 1)", "error"));
                     log.error("Patient with ID " + patientID + " could not be found!");
                     barcodeRequestView.getPatientIdInputField().addStyleName("textfield-red");
                 } else {
@@ -169,7 +170,6 @@ public class BarcodeRequestPresenter {
 
             UI.getCurrent().setPollInterval(-1);
 
-            //UI.getCurrent().getSession().unlock();
         }
 
 
