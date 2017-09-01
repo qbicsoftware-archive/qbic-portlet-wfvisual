@@ -22,9 +22,4 @@ public class BarcodeRequestModelImplTest {
         model = new BarcodeRequestModelImpl(openBisClient);
     }
 
-    @Test
-    public void request_new_patient_sample_id_pair_successfully() throws Exception{
-        Assert.assertTrue("The return value was null, which should have been a String array", model.getNewPatientSampleIdPair() != null);
-    }
-
 }
