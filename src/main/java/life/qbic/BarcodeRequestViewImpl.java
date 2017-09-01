@@ -46,7 +46,7 @@ public class BarcodeRequestViewImpl implements BarcodeRequestView {
 
     private VerticalLayout taskCreateSampleContainer;
 
-    private TextField patientIdInputField;
+    private ComboBox patientIdInputField;
 
     private Label newSampleIdLabel;
 
@@ -61,7 +61,8 @@ public class BarcodeRequestViewImpl implements BarcodeRequestView {
     private void initView() {
         // Init components
         createTaskSelectionView();
-        patientIdInputField = new TextField();
+        patientIdInputField = new ComboBox();
+        patientIdInputField.setWidth("100%");
         patientIdInputField.setValue("Enter patient ID here");
         newSampleIdLabel = new Label("<i>ID will be displayed after request.</i>", ContentMode.HTML);
         newPatientIdPanel = new Panel("Patient ID");
@@ -211,7 +212,7 @@ public class BarcodeRequestViewImpl implements BarcodeRequestView {
     }
 
     @Override
-    public TextField getPatientIdInputField() {
+    public ComboBox getPatientIdInputField() {
         return this.patientIdInputField;
     }
 

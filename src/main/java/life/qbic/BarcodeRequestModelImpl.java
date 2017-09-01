@@ -8,10 +8,7 @@ import life.qbic.helpers.BarcodeFunctions;
 import life.qbic.helpers.Utils;
 import life.qbic.openbis.openbisclient.OpenBisClient;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 import java.util.stream.Collectors;
 
 import static life.qbic.helpers.BarcodeFunctions.checksum;
@@ -136,6 +133,14 @@ public class BarcodeRequestModelImpl implements BarcodeRequestModel{
         boolean sampleRegistrationWasSuccessfull = registerTestSample(sampleBarcode, biologicalSamplesOnly.get(0).getCode());
 
         return sampleRegistrationWasSuccessfull ? sampleBarcode : "";
+    }
+
+    @Override
+    public Collection<String> getRegisteredPatients() {
+        return openBisClient.getSamplesOfProjectBySearchService(PROJECTID).stream().filter(sample -> sample.getSampleTypeCode()
+                .equals("Q_BIOLOGICAL_ENTITY"))
+                .map(Sample::getCode)
+                .collect(Collectors.toList());
     }
 
     /**
