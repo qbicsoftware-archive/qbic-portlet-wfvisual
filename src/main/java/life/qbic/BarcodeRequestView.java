@@ -80,7 +80,7 @@ public interface BarcodeRequestView {
      * Getter for the patient ID input field
      * @return The text field
      */
-    TextField getPatientIdInputField();
+    ComboBox getPatientIdInputField();
 
     /**
      * Getter for the sample ID field

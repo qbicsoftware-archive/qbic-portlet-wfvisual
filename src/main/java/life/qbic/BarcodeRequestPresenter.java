@@ -25,6 +25,11 @@ public class BarcodeRequestPresenter {
 
     private void giveLifeToElements() {
 
+        barcodeRequestView.getPatientIdInputField().setInputPrompt("Choose patient");
+
+        barcodeRequestView.getPatientIdInputField().addItems(barcodeRequestModel.getRegisteredPatients());
+
+
         barcodeRequestView.getTaskSelectionGroup().addValueChangeListener(value -> {
             if(barcodeRequestView.getTaskSelectionGroup().getValue().toString().contains("patient/sample")) {
                 barcodeRequestView.getCreatePatientContainer().setVisible(true);
@@ -121,7 +126,7 @@ public class BarcodeRequestPresenter {
         public void run() {
 
             String patientID =
-                    barcodeRequestView.getPatientIdInputField().getValue().trim();
+                    barcodeRequestView.getPatientIdInputField().getInputPrompt().trim();
             //UI.getCurrent().getSession().lock();
 
             UI.getCurrent().access(() -> {
