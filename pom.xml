@@ -116,14 +116,16 @@
 			<groupId>com.liferay.portal</groupId>
 			<artifactId>portal-service</artifactId>
 			<version>${liferay.version}</version>
-			<scope>compile</scope>
+			<!-- Change to scope 'provided', when deployed in Liferay-->
+			<scope>provided</scope>
 		</dependency>
 
 		<dependency>
 			<groupId>com.liferay.portal</groupId>
 			<artifactId>util-java</artifactId>
 			<version>${liferay.version}</version>
-			<scope>compile</scope>
+			<!-- Change to scope 'provided', when deployed in Liferay-->
+			<scope>provided</scope>
 		</dependency>
 
 		<dependency>
