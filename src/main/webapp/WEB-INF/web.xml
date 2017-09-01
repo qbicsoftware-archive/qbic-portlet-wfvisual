@@ -9,18 +9,13 @@
 		<servlet-name>ukt</servlet-name>
 		<servlet-class>com.vaadin.server.VaadinServlet</servlet-class>
 
-
         <init-param>
             <param-name>UI</param-name>
             <param-value>life.qbic.MyPortletUI</param-value>
         </init-param>
 
 	</servlet>
-	<!--
-	<servlet-mapping>
-		<servlet-name>VaadinServlet</servlet-name>
-		<url-pattern>/VAADIN/*</url-pattern>
-	</servlet-mapping>-->
+
 	<servlet-mapping>
 		<servlet-name>ukt</servlet-name>
 		<url-pattern>/*</url-pattern>

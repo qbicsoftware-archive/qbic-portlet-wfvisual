@@ -12984,3 +12984,11 @@ div.v-layout.v-horizontal.v-widget {
 	width: 19px;
 	overflow: hidden;
 }
+
+.mytheme .textfield-red {
+	background: red;
+}
+
+.mytheme .textfield-green {
+	background: green;
+}
