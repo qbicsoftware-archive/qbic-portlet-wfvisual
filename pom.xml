@@ -3,7 +3,7 @@
 	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
 	<modelVersion>4.0.0</modelVersion>
 	<groupId>life.qbic</groupId>
-	<artifactId>portlet-base</artifactId>
+	<artifactId>ukt-diagnostics</artifactId>
 	<version>1.0</version>
 	<name>QBiC Portlet Template</name>
 
@@ -117,7 +117,7 @@
 			<artifactId>portal-service</artifactId>
 			<version>${liferay.version}</version>
 			<!-- Change to scope 'provided', when deployed in Liferay-->
-			<scope>provided</scope>
+			<scope>compile</scope>
 		</dependency>
 
 		<dependency>
@@ -125,7 +125,7 @@
 			<artifactId>util-java</artifactId>
 			<version>${liferay.version}</version>
 			<!-- Change to scope 'provided', when deployed in Liferay-->
-			<scope>provided</scope>
+			<scope>compile</scope>
 		</dependency>
 
 		<dependency>
