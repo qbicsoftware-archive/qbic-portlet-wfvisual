@@ -97,6 +97,7 @@ public class BarcodeRequestPresenter {
             } else {
                 barcodeRequestView.getPatientIdField().setValue(patientSampleIdPair[0]);
                 barcodeRequestView.getSampleIdField().setValue(patientSampleIdPair[1]);
+                barcodeRequestView.getPatientIdInputField().addItem(patientSampleIdPair[0]);
             }
 
             UI.getCurrent().access(() -> {
