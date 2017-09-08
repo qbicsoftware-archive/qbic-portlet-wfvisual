@@ -42,6 +42,7 @@ public class BarcodeRequestPresenter {
 
         barcodeRequestView.getPatentIdSampleIdButton().addClickListener(clickEvent -> {
             barcodeRequestView.getPatentIdSampleIdButton().setEnabled(false);
+            barcodeRequestView.getTaskSelectionGroup().setEnabled(false);
             Thread request = new RequestThread();
             request.start();
             UI.getCurrent().setPollInterval(50);
@@ -50,6 +51,7 @@ public class BarcodeRequestPresenter {
 
         barcodeRequestView.getCreateSampleButton().addClickListener(clickEvent -> {
             barcodeRequestView.getCreateSampleButton().setEnabled(false);
+            barcodeRequestView.getTaskSelectionGroup().setEnabled(false);
             Thread request = new NewSampleRequestThread();
             request.start();
             UI.getCurrent().setPollInterval(50);
@@ -100,6 +102,7 @@ public class BarcodeRequestPresenter {
             UI.getCurrent().access(() -> {
                 container.setVisible(false);
                 barcodeRequestView.getPatentIdSampleIdButton().setEnabled(true);
+                barcodeRequestView.getTaskSelectionGroup().setEnabled(true);
             });
 
             // Stop polling
@@ -166,6 +169,7 @@ public class BarcodeRequestPresenter {
             UI.getCurrent().access(() -> {
                 loadingInfoContainer.setVisible(false);
                 barcodeRequestView.getCreateSampleButton().setEnabled(true);
+                barcodeRequestView.getTaskSelectionGroup().setEnabled(true);
             });
 
             UI.getCurrent().setPollInterval(-1);
