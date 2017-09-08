@@ -117,7 +117,7 @@
 			<artifactId>portal-service</artifactId>
 			<version>${liferay.version}</version>
 			<!-- Change to scope 'provided', when deployed in Liferay-->
-			<scope>compile</scope>
+			<scope>provided</scope>
 		</dependency>
 
 		<dependency>
@@ -125,7 +125,7 @@
 			<artifactId>util-java</artifactId>
 			<version>${liferay.version}</version>
 			<!-- Change to scope 'provided', when deployed in Liferay-->
-			<scope>compile</scope>
+			<scope>provided</scope>
 		</dependency>
 
 		<dependency>
