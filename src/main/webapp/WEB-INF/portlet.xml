@@ -7,15 +7,15 @@
 	version="2.0">
 
 	<portlet>
-		<description>This is a QBiC Portlet Template</description>
-		<portlet-name>QBiC Portlet Template</portlet-name>
-		<display-name>QBiC Portlet Template</display-name>
+		<description>A simple request interface for patient/sample ID tuples.</description>
+		<portlet-name>UKT diagnostics ID</portlet-name>
+		<display-name>UKT diagnostics ID</display-name>
 
 		<portlet-class>com.vaadin.server.VaadinPortlet</portlet-class>
 
 		<init-param>
 			<name>UI</name>
-			<value>com.qbic.life.portal_template.MyPortletUI</value>
+			<value>life.qbic.MyPortletUI</value>
 		</init-param>
 
 		<init-param>
@@ -30,8 +30,8 @@
 
 
 		<portlet-info>
-			<title>QBiC Portlet Template</title>
-			<short-title>QBiC Portlet Template</short-title>
+			<title>UKT diagnostics ID</title>
+			<short-title>UKT diagnostics ID</short-title>
 			<keywords>Vaadin 7</keywords>
 		</portlet-info>
 
