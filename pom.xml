@@ -316,5 +316,17 @@
 			</pluginRepositories>
 		</profile>
 	</profiles>
+	<distributionManagement>
+		<snapshotRepository>
+			<id>nexus-snapshots</id>
+			<url>https://peltzer.com.de/nexus/content/repositories/snapshots/</url>
+		</snapshotRepository>
+		<repository>
+			<uniqueVersion>false</uniqueVersion>
+			<id>nexus-release</id>
+			<name>Nexus Releases</name>
+			<url>https://peltzer.com.de/nexus/content/repositories/releases/</url>
+		</repository>
+	</distributionManagement>
 
 </project>
