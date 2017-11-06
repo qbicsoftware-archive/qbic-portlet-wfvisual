@@ -4,7 +4,7 @@
 	<modelVersion>4.0.0</modelVersion>
 	<groupId>life.qbic</groupId>
 	<artifactId>ukt-diagnostics</artifactId>
-	<version>1.0</version>
+	<version>1.1-SNAPSHOT</version>
 	<name>QBiC Portlet Template</name>
 
 	<properties>
@@ -335,7 +335,6 @@
 			<name>QBiC Snapshots</name>
 			<url>https://qbic-repo.am10.uni-tuebingen.de/repository/maven-snapshots</url>
 		</snapshotRepository>
-
 	</distributionManagement>
 
 </project>
