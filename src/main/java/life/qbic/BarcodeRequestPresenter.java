@@ -155,7 +155,7 @@ public class BarcodeRequestPresenter {
                 } else {
                     loadingLabel.setValue("Patient found, creating and registering new sample ...");
                     barcodeRequestView.getPatientIdInputField().removeStyleName("textfield-red");
-                    String sampleCode = barcodeRequestModel.addNewSampleToPatient(patientID);
+                    String sampleCode = barcodeRequestModel.addNewSampleToPatient(patientID, "tumor tissue");
                     if(sampleCode.isEmpty()){
                         Utils.Notification("Sample registration error",
                                 "Please contact us via helpdesk@qbic.uni-tuebingen.de",

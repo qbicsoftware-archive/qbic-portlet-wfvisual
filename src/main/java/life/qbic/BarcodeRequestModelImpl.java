@@ -1,7 +1,6 @@
 package life.qbic;
 
 import ch.systemsx.cisd.openbis.generic.shared.api.v1.dto.Sample;
-import ch.systemsx.cisd.openbis.generic.shared.api.v1.dto.SearchCriteria;
 import com.liferay.portal.kernel.log.Log;
 import com.liferay.portal.kernel.log.LogFactoryUtil;
 import life.qbic.helpers.BarcodeFunctions;
@@ -98,7 +97,7 @@ public class BarcodeRequestModelImpl implements BarcodeRequestModel{
     }
 
     @Override
-    public String addNewSampleToPatient(String patientID) {
+    public String addNewSampleToPatient(String patientID, String filterProperty) {
         List<Sample> sampleList = openBisClient.getSamplesWithParentsAndChildren(patientID).get(0).getChildren();
 
         if (sampleList.size() == 0){
@@ -108,7 +107,8 @@ public class BarcodeRequestModelImpl implements BarcodeRequestModel{
 
         List<Sample> biologicalSamplesOnly = sampleList.stream().filter(sample -> sample.getSampleTypeCode()
                 .equals("Q_BIOLOGICAL_SAMPLE"))
-                .collect(Collectors.toList());
+                .collect(Collectors.toList())
+                .stream().filter(sample -> sample.getPropertiesJson().containsValue(filterProperty)).collect(Collectors.toList());
 
         int size = biologicalSamplesOnly.size();
 
@@ -208,7 +208,7 @@ public class BarcodeRequestModelImpl implements BarcodeRequestModel{
         List<String> parents = new ArrayList<>();
 
         metadata.put("Q_PRIMARY_TISSUE", "Other");
-        metadata.put("Q_TISSUE_DETAILED", "unknown");
+        metadata.put("Q_TISSUE_DETAILED", "tumor tissue");
         parents.add(parent);
 
         map.put("code", biologicalSampleCode);
