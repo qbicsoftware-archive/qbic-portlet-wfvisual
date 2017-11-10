@@ -4,7 +4,7 @@
 	<modelVersion>4.0.0</modelVersion>
 	<groupId>life.qbic</groupId>
 	<artifactId>ukt-diagnostics</artifactId>
-	<version>1.0</version>
+	<version>1.1</version>
 	<name>QBiC Portlet Template</name>
 
 	<properties>
@@ -28,9 +28,14 @@
 			<url>http://maven.vaadin.com/vaadin-addons</url>
 		</repository>
 		<repository>
-			<id>nexusRelease</id>
+			<id>nexus-snap</id>
+			<name>qbic snapshots</name>
+			<url>https://qbic-repo.am10.uni-tuebingen.de/repository/maven-snapshots</url>
+		</repository>
+		<repository>
+			<id>nexus-release</id>
 			<name>qbic release</name>
-			<url>https://peltzer.com.de/nexus/content/repositories/releases</url>
+			<url>https://qbic-repo.am10.uni-tuebingen.de/repository/maven-releases</url>
 		</repository>
 	</repositories>
 
@@ -316,17 +321,20 @@
 			</pluginRepositories>
 		</profile>
 	</profiles>
+
 	<distributionManagement>
-		<snapshotRepository>
-			<id>nexus-snapshots</id>
-			<url>https://peltzer.com.de/nexus/content/repositories/snapshots/</url>
-		</snapshotRepository>
 		<repository>
-			<uniqueVersion>false</uniqueVersion>
+			<uniqueVersion>true</uniqueVersion>
 			<id>nexus-release</id>
-			<name>Nexus Releases</name>
-			<url>https://peltzer.com.de/nexus/content/repositories/releases/</url>
+			<name>QBiC Releases</name>
+			<url>https://qbic-repo.am10.uni-tuebingen.de/repository/maven-releases</url>
 		</repository>
+		<snapshotRepository>
+			<uniqueVersion>false</uniqueVersion>
+			<id>nexus-snap</id>
+			<name>QBiC Snapshots</name>
+			<url>https://qbic-repo.am10.uni-tuebingen.de/repository/maven-snapshots</url>
+		</snapshotRepository>
 	</distributionManagement>
 
 </project>
