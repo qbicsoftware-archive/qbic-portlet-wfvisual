@@ -130,7 +130,7 @@ public class BarcodeRequestPresenter {
 
             String patientID =
                     barcodeRequestView.getPatientIdInputField().getValue().toString().trim();
-            log.info("Selection: " + patientID);
+            log.debug("Selection: " + patientID);
 
 
             UI.getCurrent().access(()->
