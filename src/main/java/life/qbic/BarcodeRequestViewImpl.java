@@ -89,7 +89,7 @@ public class BarcodeRequestViewImpl implements BarcodeRequestView {
         // Add components
         panelContainer.addComponents(patientIdField, sampleIdPanel);
         panelContainerTask2.addComponents(newPatientIdPanel, newSampleIdPanel);
-        fullView.addComponent(new Label("<h1>UKT diagnostics ID request sheet</h1>", ContentMode.HTML));
+        fullView.addComponent(new Label("<h1>UKT diagnostics ID request sheet</h1> v" + AppInfo.VERSION, ContentMode.HTML));
 
         // Compose new patient request layout form
         taskCreatePatientContainer.addComponents(patientIdsampleIdButton, panelContainer);
