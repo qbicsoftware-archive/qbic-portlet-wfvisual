@@ -28,13 +28,14 @@ public interface BarcodeRequestModel {
     boolean checkIfPatientExists(String sampleID);
 
     /**
-     * Tries to register a sample in openBIS and returns the
+     * Tries to register a sample (TEST_SAMPLE) in openBIS and returns the
      * barcode, if registration was successful
      * @param patientID The QBiC patient ID
+     * @param filterProperty Filters BIOLOGICAL SAMPLE for a property value!
      * @return A valid sample ID, an empty string if registration
      * did not work
      */
-    String addNewSampleToPatient(String patientID);
+    String addNewSampleToPatient(String patientID, String filterProperty);
 
     /**
      * Querries all registered patient IDs

@@ -1,7 +1,6 @@
 package life.qbic;
 
 import ch.systemsx.cisd.openbis.generic.shared.api.v1.dto.Sample;
-import ch.systemsx.cisd.openbis.generic.shared.api.v1.dto.SearchCriteria;
 import com.liferay.portal.kernel.log.Log;
 import com.liferay.portal.kernel.log.LogFactoryUtil;
 import life.qbic.helpers.BarcodeFunctions;
@@ -40,22 +39,27 @@ public class BarcodeRequestModelImpl implements BarcodeRequestModel{
         int[] sizes = getNumberOfSampleTypes();
 
         // offset is +2, because there is always an attachment sample per project
-        String biologicalSampleCode = createBarcodeFromInteger(sizes[0] + 2 );
+        String biologicalSampleCodeBlood = createBarcodeFromInteger(sizes[0] + 2 );
+        String biologicalSampleCodeTumor = createBarcodeFromInteger(sizes[0] + 3 );
 
         // offset is +3, because of the previous created sample and the attachement
-        String testSampleCode = createBarcodeFromInteger(sizes[0] + 3);
+        String testSampleCodeBlood = createBarcodeFromInteger(sizes[0] + 4);
+        String testSampleCodeTumor = createBarcodeFromInteger(sizes[0] + 5);
         String patientId = CODE + "ENTITY-" + (sizes[1] + 1);
 
         patientSampleIdPair[0] = patientId;
-        patientSampleIdPair[1] = testSampleCode;
+        patientSampleIdPair[1] = testSampleCodeTumor;
 
         // Logging code block
         log.debug(String.format("Number of non-entity samples: %s", sizes[0]));
         log.info(String.format("%s: New patient ID created %s", AppInfo.getAppInfo(), patientSampleIdPair[0]));
-        log.info(String.format("%s: New sample ID created %s", AppInfo.getAppInfo(), patientSampleIdPair[1]));
+        log.info(String.format("%s: New tumor sample ID created %s", AppInfo.getAppInfo(), patientSampleIdPair[1]));
+        log.info(String.format("%s: New blood sample ID created %s", AppInfo.getAppInfo(), biologicalSampleCodeBlood));
+        log.info(String.format("%s: New blood DNA sample ID created %s", AppInfo.getAppInfo(), testSampleCodeBlood));
 
         // In case registration fails, return null
-        if(!registerNewPatient(patientId, biologicalSampleCode, testSampleCode))
+        if(!registerNewPatient(patientId, biologicalSampleCodeTumor,
+                biologicalSampleCodeBlood, testSampleCodeTumor, testSampleCodeBlood))
             patientSampleIdPair = null;
 
     }
@@ -98,7 +102,7 @@ public class BarcodeRequestModelImpl implements BarcodeRequestModel{
     }
 
     @Override
-    public String addNewSampleToPatient(String patientID) {
+    public String addNewSampleToPatient(String patientID, String filterProperty) {
         List<Sample> sampleList = openBisClient.getSamplesWithParentsAndChildren(patientID).get(0).getChildren();
 
         if (sampleList.size() == 0){
@@ -108,7 +112,8 @@ public class BarcodeRequestModelImpl implements BarcodeRequestModel{
 
         List<Sample> biologicalSamplesOnly = sampleList.stream().filter(sample -> sample.getSampleTypeCode()
                 .equals("Q_BIOLOGICAL_SAMPLE"))
-                .collect(Collectors.toList());
+                .collect(Collectors.toList())
+                .stream().filter(sample -> sample.getPropertiesJson().containsValue(filterProperty)).collect(Collectors.toList());
 
         int size = biologicalSamplesOnly.size();
 
@@ -146,14 +151,19 @@ public class BarcodeRequestModelImpl implements BarcodeRequestModel{
     /**
      * Registration of a new patient with samples
      * @param patientId A code for the sample type Q_BIOLOGICAL_ENTITY
-     * @param biologicalSampleCode A code for the sample type Q_BIOLOGICAL_SAMPLE
-     * @param testSampleCode A code for the sample type Q_TEST_SAMPLE
+     * @param biologicalSampleCodeBlood A code for the sample type Q_BIOLOGICAL_SAMPLE (Blood)
+     * @param biologicalSampleCodeTumor A code for the sample type Q_BIOLOGICAL_SAMPLE (Tumor)
+     * @param testSampleCodeBlood A code for the sample type Q_TEST_SAMPLE (Blood)
+     * @param testSampleCodeTumor A code for the sample type Q_TEST_SAMPLE (Tumor)
      * @return True, if registration was successful, else false
      */
-    private boolean registerNewPatient(String patientId, String biologicalSampleCode, String testSampleCode) {
+    private boolean registerNewPatient(String patientId, String biologicalSampleCodeTumor, String biologicalSampleCodeBlood,
+                                       String testSampleCodeTumor, String testSampleCodeBlood) {
         if (registerEntity(patientId) &&
-                registerBioSample(biologicalSampleCode, "/"+SPACE+"/"+patientId) &&
-                registerTestSample(testSampleCode, "/"+SPACE+"/"+biologicalSampleCode)){
+                registerBioSample(biologicalSampleCodeTumor, "/"+SPACE+"/"+patientId, "tumor tissue") &&
+                registerTestSample(testSampleCodeTumor, "/"+SPACE+"/"+biologicalSampleCodeTumor) &&
+                registerBioSample(biologicalSampleCodeBlood, "/"+SPACE+"/"+patientId, "blood") &&
+                registerTestSample(testSampleCodeBlood, "/"+SPACE+"/"+biologicalSampleCodeBlood)){
             return true;
         }
 
@@ -201,14 +211,18 @@ public class BarcodeRequestModelImpl implements BarcodeRequestModel{
      * @param parent A code for the parent sample type Q_BIOLOGICAL_ENTITY
      * @return True, if registration was successful, else false
      */
-    private boolean registerBioSample(String biologicalSampleCode, String parent) {
+    private boolean registerBioSample(String biologicalSampleCode, String parent, String tissue) {
         Map<String, Object> params = new HashMap<>();
         Map<String, Object> map = new HashMap<>();
         Map<String, Object> metadata = new HashMap<>();
         List<String> parents = new ArrayList<>();
 
-        metadata.put("Q_PRIMARY_TISSUE", "Other");
-        metadata.put("Q_TISSUE_DETAILED", "unknown");
+        if (tissue.equals("blood")){
+            metadata.put("Q_PRIMARY_TISSUE", "WHOLE_BLOOD");
+        } else {
+            metadata.put("Q_PRIMARY_TISSUE", "Other");
+        }
+        metadata.put("Q_TISSUE_DETAILED", tissue);
         parents.add(parent);
 
         map.put("code", biologicalSampleCode);
