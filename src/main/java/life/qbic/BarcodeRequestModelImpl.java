@@ -220,7 +220,7 @@ public class BarcodeRequestModelImpl implements BarcodeRequestModel{
         if (tissue.equals("blood")){
             metadata.put("Q_PRIMARY_TISSUE", "WHOLE_BLOOD");
         } else {
-            metadata.put("Q_PRIMARY_TISSUE", "Other");
+            metadata.put("Q_PRIMARY_TISSUE", "TUMOR_TISSUE_UNSPECIFIED");
         }
         metadata.put("Q_TISSUE_DETAILED", tissue);
         parents.add(parent);
