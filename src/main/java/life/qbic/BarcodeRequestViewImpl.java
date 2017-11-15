@@ -89,7 +89,7 @@ public class BarcodeRequestViewImpl implements BarcodeRequestView {
         // Add components
         panelContainer.addComponents(patientIdField, sampleIdPanel);
         panelContainerTask2.addComponents(newPatientIdPanel, newSampleIdPanel);
-        fullView.addComponent(new Label("<h1>UKT diagnostics ID request sheet (" + AppInfo.VERSION + ")</h1>", ContentMode.HTML));
+        fullView.addComponent(new Label("<h1>UKT diagnostics ID request sheet</h1>", ContentMode.HTML));
 
         // Compose new patient request layout form
         taskCreatePatientContainer.addComponents(patientIdsampleIdButton, panelContainer);
@@ -103,6 +103,7 @@ public class BarcodeRequestViewImpl implements BarcodeRequestView {
 
         // Compose new sample request layout form
         fullView.addComponents(taskSelection, taskCreatePatientContainer, taskCreateSampleContainer, spinnerContainer);
+        fullView.addComponent(new Label("Version " + AppInfo.VERSION));
         fullView.setSpacing(true);
 
         // we want a spinner not a progress bar
@@ -147,6 +148,8 @@ public class BarcodeRequestViewImpl implements BarcodeRequestView {
         newSampleIdPanel.setContent(innerSampleIdLayoutTask2);
         newSampleIdPanel.setHeight(100, Sizeable.Unit.PERCENTAGE);
         newSampleIdPanel.setIcon(FontAwesome.FILE_O);
+
+
 
     }
 
