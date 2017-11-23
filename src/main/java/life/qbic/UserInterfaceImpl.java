@@ -67,6 +67,7 @@ class UserInterfaceImpl implements UserInterface{
         
 		@Override
 		public OutputStream receiveUpload(String filename, String mimeType) {
+            
             fileNameLabel.setValue("Upload in progress...");
 
 			return new OutputStream(){
