@@ -2,9 +2,11 @@ package life.qbic.charts;
 
 import java.util.Arrays;
 
-public class Histogram <Type extends Number>{
+import org.apache.commons.lang.ArrayUtils;
 
-    private Type[] dataSeries;
+public class Histogram {
+
+    private double[] dataSeries;
 
     private int[] counts;
 
@@ -15,12 +17,17 @@ public class Histogram <Type extends Number>{
         this.breaks = new double[0];
     }
 
-    public Histogram<Type> setData(Type[] data){
+    public Histogram setData(double[] data){
         this.dataSeries = data;
         return this;
     }
 
-    public Histogram<Type> compute(){
+    public Histogram setData(Double[] data){
+        this.dataSeries = ArrayUtils.toPrimitive(data);
+        return this;
+    }
+
+    public Histogram compute(){
         computeHistogram();
         return this;
     }
@@ -49,16 +56,16 @@ public class Histogram <Type extends Number>{
 
         // Sort the array and extract min + max
         Arrays.sort(dataSeries);
-        Type min = dataSeries[0];
-        Type max = dataSeries[dataSeries.length-1];
+        double min = dataSeries[0];
+        double max = dataSeries[dataSeries.length-1];
 
         // Compute the bin width (roughly)
-        int h = (int) Math.ceil(((double) max - (double) min) / k);
+        double h = Math.ceil((max - min) / k);
         this.breaks = new double[k];
 
         // Compute the breaks
-        for (int i = 1; i <= k; i++){
-            this.breaks[i] = (double) min + ( k * h ); 
+        for (int i = 0; i < k; i++){
+            this.breaks[i] = (double) min + ( (i+1) * h ); 
         }
     }
 
@@ -70,7 +77,7 @@ public class Histogram <Type extends Number>{
         int memIndex = 0;
         for (int i = 0; i < this.breaks.length; i++){
             for (int j = memIndex; j < this.dataSeries.length; j++){
-                if ((int) this.dataSeries[j] < this.breaks[i]){
+                if (this.dataSeries[j] < this.breaks[i]){
                     this.counts[i] += 1;
                 } else {
                     memIndex = j + 1;

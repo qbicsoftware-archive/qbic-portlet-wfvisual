@@ -1,7 +1,7 @@
 package life.qbic;
 
-import com.liferay.portal.kernel.servlet.WrapHttpServletRequestFilter;
-import com.vaadin.ui.Button;
+import com.google.common.base.Functions;
+import com.google.common.collect.Lists;
 import com.vaadin.ui.HorizontalLayout;
 import com.vaadin.ui.Label;
 import com.vaadin.ui.UI;
@@ -13,16 +13,23 @@ import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.OutputStream;
-import java.nio.charset.Charset;
-import java.nio.file.Files;
-import java.nio.file.Paths;
 import java.util.Iterator;
-import java.util.UUID;
+import java.util.List;
+import java.util.stream.Collector;
+import java.util.stream.Collectors;
+
+import org.apache.commons.lang3.StringUtils;
+
 import com.vaadin.ui.Upload.FinishedEvent;
 import com.vaadin.ui.Upload.Receiver;
 import com.vaadin.ui.Upload.StartedEvent;
 import com.vaadin.ui.Upload.SucceededEvent;
 import com.vaadin.ui.Upload.SucceededListener;
+
+import life.qbic.charts.CpuHist;
+import life.qbic.charts.Histogram;
+import com.vaadin.addon.charts.model.Configuration;
+import com.vaadin.addon.charts.model.ListSeries;
 import com.vaadin.ui.Upload;
 
 /**
@@ -33,21 +40,17 @@ import com.vaadin.ui.Upload;
  */
 class UserInterfaceImpl implements UserInterface{
 
-    private VerticalLayout mainBody;
+    VerticalLayout mainBody;
 
-    private HorizontalLayout uploadArea;
+    HorizontalLayout uploadArea;
 
-    private HorizontalLayout chartArea;
+    HorizontalLayout chartArea;
 
-    private Upload fileUpload;
+    Upload fileUpload;
 
-    private Label fileNameLabel;
+    Label fileNameLabel;
 
-    private TraceContainer traceContainer;
-
-    private BufferedReader reader;
-
-    private UUID uuid;
+    TraceContainer traceContainer;
 
     public UserInterfaceImpl(){
 
@@ -113,7 +116,6 @@ class UserInterfaceImpl implements UserInterface{
                 exc.printStackTrace();
             }
 
-            System.out.println("Header size: " + traceContainer.getHeader().length);
 
             Iterator<String[]> iterator = traceContainer.iterator();
             while(iterator.hasNext()){
@@ -122,6 +124,9 @@ class UserInterfaceImpl implements UserInterface{
                 }
                 System.out.print("\n");
             }
+
+            InterfaceController iController = new InterfaceController();
+            iController.loadCpuHistogram();
         
         }
         
@@ -142,6 +147,50 @@ class UserInterfaceImpl implements UserInterface{
 		public void uploadStarted(StartedEvent event) {
 			UI.getCurrent().setPollInterval(100);
 		}
+
+    }
+
+    class InterfaceController {
+
+        InterfaceController(){}
+
+        void loadCpuHistogram(){
+            Histogram hist = new Histogram();
+            List<String> tmp = traceContainer.getColumnValues("%cpu");
+            List<Double> cpuUsage = tmp.stream().map(v -> v.replace("%", ""))
+                                                .filter(e -> isNumeric(e))
+                                                .map(Double::parseDouble)
+                                                .collect(Collectors.toList());
+            hist.setData(cpuUsage.toArray(new Double[cpuUsage.size()]));                            
+            hist.compute();
+            
+            double[] breaks = hist.getBreaks();
+            int[] counts = hist.getCounts();
+
+            CpuHist cpuHist = new CpuHist();
+            Configuration config = cpuHist.getConfiguration();
+            ListSeries list = new ListSeries();
+            for(Integer count : counts){
+                list.addData(count);
+            }
+            config.addSeries(list);
+            chartArea.addComponent(cpuHist);
+            
+        }
+
+        public boolean isNumeric(String str)  
+        {  
+          try  
+          {  
+            double d = Double.parseDouble(str);  
+          }  
+          catch(NumberFormatException nfe)  
+          {  
+            return false;  
+          }  
+          return true;  
+        }
+        
 
     }
 

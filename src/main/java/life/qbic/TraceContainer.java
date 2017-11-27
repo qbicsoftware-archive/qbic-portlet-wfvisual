@@ -9,7 +9,7 @@ import java.util.ArrayList;
 
 class TraceContainer<Type> implements Iterable<Type[]>{
 
-    private Map<String, List<Object>> traceTable;
+    private Map<String, List<String>> traceTable;
 
     private Map<Integer, String> traceColumnNoToName;
 
@@ -44,7 +44,7 @@ class TraceContainer<Type> implements Iterable<Type[]>{
         return (String []) this.traceColumnNoToName.values().toArray(new String[traceColumnNoToName.values().size()]);
     }
 
-    public List<Object> getColumnValues(String columnName){
+    public List<String> getColumnValues(String columnName){
         return this.traceTable.get(columnName);
     }
 
