@@ -1,7 +1,5 @@
 package life.qbic;
 
-import com.google.common.base.Functions;
-import com.google.common.collect.Lists;
 import com.vaadin.ui.HorizontalLayout;
 import com.vaadin.ui.Label;
 import com.vaadin.ui.UI;
@@ -15,10 +13,10 @@ import java.io.InputStreamReader;
 import java.io.OutputStream;
 import java.util.Iterator;
 import java.util.List;
-import java.util.stream.Collector;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Comparator;
 import java.util.stream.Collectors;
-
-import org.apache.commons.lang3.StringUtils;
 
 import com.vaadin.ui.Upload.FinishedEvent;
 import com.vaadin.ui.Upload.Receiver;
@@ -27,9 +25,12 @@ import com.vaadin.ui.Upload.SucceededEvent;
 import com.vaadin.ui.Upload.SucceededListener;
 
 import life.qbic.charts.CpuHist;
+import life.qbic.charts.CpuPerformance;
 import life.qbic.charts.Histogram;
 import com.vaadin.addon.charts.model.Configuration;
 import com.vaadin.addon.charts.model.ListSeries;
+import com.vaadin.addon.charts.model.XAxis;
+import com.vaadin.addon.charts.Chart;
 import com.vaadin.ui.Upload;
 
 /**
@@ -100,11 +101,14 @@ class UserInterfaceImpl implements UserInterface{
 		@Override
 		public void uploadSucceeded(SucceededEvent event) {
             fileNameLabel.setValue("Upload was successful.");
+            chartArea.removeAllComponents();
             boolean headerWritten = false;
             BufferedReader bfReader = new BufferedReader(new InputStreamReader(new ByteArrayInputStream(os.toByteArray())));
             try {
                 String line = null;
                 while ((line = bfReader.readLine()) != null){
+                    if(line.contains("get_software_versions"))
+                        continue;
                     if(headerWritten){
                         traceContainer.addTableRow(line.trim().split("\t"));
                     } else {
@@ -127,12 +131,13 @@ class UserInterfaceImpl implements UserInterface{
 
             InterfaceController iController = new InterfaceController();
             iController.loadCpuHistogram();
+            iController.loadCpuPerformance();
         
         }
         
 		@Override
 		public OutputStream receiveUpload(String filename, String mimeType) {
-            traceContainer = new TraceContainer<>();
+            traceContainer = new TraceContainer();
             os.reset();
             return os;
 		}
@@ -152,12 +157,16 @@ class UserInterfaceImpl implements UserInterface{
 
     class InterfaceController {
 
+        List<Double> cpuUsage;
+        List<Double> cpuRessources;
+        List<Double> cpuEfficiency;
+
         InterfaceController(){}
 
         void loadCpuHistogram(){
             Histogram hist = new Histogram();
             List<String> tmp = traceContainer.getColumnValues("%cpu");
-            List<Double> cpuUsage = tmp.stream().map(v -> v.replace("%", ""))
+            this.cpuUsage = tmp.stream().map(v -> v.replace("%", ""))
                                                 .filter(e -> isNumeric(e))
                                                 .map(Double::parseDouble)
                                                 .collect(Collectors.toList());
@@ -167,7 +176,7 @@ class UserInterfaceImpl implements UserInterface{
             double[] breaks = hist.getBreaks();
             int[] counts = hist.getCounts();
 
-            CpuHist cpuHist = new CpuHist();
+            Chart cpuHist = new CpuHist();
             Configuration config = cpuHist.getConfiguration();
             ListSeries list = new ListSeries();
             for(Integer count : counts){
@@ -176,6 +185,28 @@ class UserInterfaceImpl implements UserInterface{
             config.addSeries(list);
             chartArea.addComponent(cpuHist);
             
+        }
+
+        void loadCpuPerformance(){
+            Chart cpuPerformance = new CpuPerformance();
+            Configuration config = cpuPerformance.getConfiguration();
+            List<String> tmp = traceContainer.getColumnValues("cpus");
+        
+            List<Task> taskList = traceContainer.getTaskList();
+
+            // Now sort it based on task id
+            taskList.sort(Comparator.comparing(Task::getProcess));
+
+            ListSeries data = new ListSeries();
+            for(Task task : taskList){
+                System.out.println(task.getTaskId());
+                data.addData(computeLogRatio((double) task.getCpusRequested(), task.getCpuUsed()));
+            }
+            config.addSeries(data);
+            XAxis xAxis = new XAxis();
+            taskList.forEach((Task task) -> xAxis.addCategory(task.getProcess()));
+            config.addxAxis(xAxis);
+            chartArea.addComponent(cpuPerformance);
         }
 
         public boolean isNumeric(String str)  
@@ -189,6 +220,25 @@ class UserInterfaceImpl implements UserInterface{
             return false;  
           }  
           return true;  
+        }
+
+
+        private List<Double> computeLogRatios (List<Double> oneList, List<Double> anotherList){
+            List<Double> logRatios = new ArrayList<>();
+            if (oneList.size() != anotherList.size()){
+                return logRatios;
+            }
+            for (int i = 0; i < oneList.size(); i++){
+                double valueOne = oneList.get(i);
+                double valueTwo = anotherList.get(i);
+                double logRatio = Math.log10(valueOne) - Math.log10(valueTwo/100);
+                logRatios.add(logRatio);
+            }
+            return logRatios;
+        }
+
+        private Double computeLogRatio (Double value1, Double value2){
+            return Math.log10(value1) - Math.log10(value2);
         }
         
 

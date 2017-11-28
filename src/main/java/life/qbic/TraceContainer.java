@@ -7,15 +7,18 @@ import java.util.List;
 import java.util.Map;
 import java.util.ArrayList;
 
-class TraceContainer<Type> implements Iterable<Type[]>{
+class TraceContainer implements Iterable<String[]>{
 
     private Map<String, List<String>> traceTable;
 
     private Map<Integer, String> traceColumnNoToName;
 
+    private List<Task> taskList;
+
     public TraceContainer(){
         traceTable = new HashMap<>();
         traceColumnNoToName = new HashMap<>();
+        taskList = new ArrayList<>();
     }
 
     public void setTableHeader(String[] header){
@@ -38,6 +41,21 @@ class TraceContainer<Type> implements Iterable<Type[]>{
             }
             currCol++;
         }
+        parseTask(row);
+    }
+
+
+    private void parseTask(String[] row){
+        Task newTask = new Task();
+        newTask.setTaskId(Integer.parseInt(row[0]));
+        newTask.setCpusRequested(Integer.parseInt(row[7]));
+        newTask.setCpuUsed(Double.parseDouble(row[12].replace("%", ""))/100);
+        newTask.setProcess(row[2]);
+        taskList.add(newTask);
+    }
+
+    public List<Task> getTaskList(){
+        return this.taskList;
     }
 
     public String[] getHeader(){
@@ -49,9 +67,9 @@ class TraceContainer<Type> implements Iterable<Type[]>{
     }
 
 	@Override
-	public Iterator<Type[]> iterator() {
+	public Iterator<String[]> iterator() {
 
-        Iterator<Type[]> it = new Iterator<Type[]>() {
+        Iterator<String[]> it = new Iterator<String[]>() {
             private int currentIndex = 0;
             private boolean hasNext = true;
 
@@ -61,7 +79,7 @@ class TraceContainer<Type> implements Iterable<Type[]>{
 			}
 
 			@Override
-			public Type[] next() {
+			public String[] next() {
                 List<String> list = new ArrayList<>();
                 try {
                     for (String col : traceColumnNoToName.values()){
@@ -71,7 +89,7 @@ class TraceContainer<Type> implements Iterable<Type[]>{
                     hasNext = false;
                 }
                 currentIndex++;
-				return (Type[]) list.toArray(new String[list.size()]);
+				return (String[]) list.toArray(new String[list.size()]);
 			}
         };
 
