@@ -16,6 +16,7 @@ import java.util.List;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
+import java.util.stream.Collector;
 import java.util.stream.Collectors;
 
 import com.vaadin.ui.Upload.FinishedEvent;
@@ -31,6 +32,7 @@ import life.qbic.charts.Histogram;
 import com.vaadin.addon.charts.model.Configuration;
 import com.vaadin.addon.charts.model.ListSeries;
 import com.vaadin.addon.charts.model.XAxis;
+import com.vaadin.addon.charts.model.YAxis;
 import com.vaadin.addon.charts.Chart;
 import com.vaadin.ui.Upload;
 
@@ -194,20 +196,32 @@ class UserInterfaceImpl implements UserInterface{
             Configuration config = cpuPerformance.getConfiguration();
             List<String> tmp = traceContainer.getColumnValues("cpus");
         
-            List<Task> taskList = traceContainer.getTaskList();
+            List<Task> taskList = traceContainer.getTaskList().stream()
+                                                .filter(task -> task.getCpusRequested() > 1)
+                                                .collect(Collectors.toList());
 
             // Now sort it based on task id
             taskList.sort(Comparator.comparing(Task::getProcess));
 
-            ListSeries data = new ListSeries();
+            ListSeries requestedCPU = new ListSeries();
+            requestedCPU.setName("Requested CPUs");
+            ListSeries usedCPU = new ListSeries();
+            usedCPU.setName("Used CPUs");
             for(Task task : taskList){
-                System.out.println(task.getTaskId());
-                data.addData(computeLogRatio((double) task.getCpusRequested(), task.getCpuUsed()));
+                usedCPU.addData(task.getCpuUsed());
+                requestedCPU.addData((double) task.getCpusRequested()-task.getCpuUsed());
             }
-            config.addSeries(data);
+            config.addSeries(requestedCPU);
+            config.addSeries(usedCPU);
+
+            YAxis yAxis = new YAxis();
+            yAxis.setTitle("Number of CPUs");
+            
             XAxis xAxis = new XAxis();
+            xAxis.setTitle("Processes");
             taskList.forEach((Task task) -> xAxis.addCategory(task.getProcess()));
             config.addxAxis(xAxis);
+            config.addyAxis(yAxis);
             chartArea.addComponent(cpuPerformance);
 
             mainBody.addComponent(new Download().createDownloadButton("CPU Performance SVG", cpuPerformance));

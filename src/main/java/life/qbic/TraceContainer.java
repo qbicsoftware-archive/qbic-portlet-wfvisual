@@ -49,7 +49,7 @@ class TraceContainer implements Iterable<String[]>{
         Task newTask = new Task();
         newTask.setTaskId(Integer.parseInt(row[0]));
         newTask.setCpusRequested(Integer.parseInt(row[7]));
-        newTask.setCpuUsed(Double.parseDouble(row[12].replace("%", ""))/100);
+        newTask.setCpuUsed(Double.parseDouble(row[12].replace("%", ""))/100d);
         newTask.setProcess(row[2]);
         taskList.add(newTask);
     }
