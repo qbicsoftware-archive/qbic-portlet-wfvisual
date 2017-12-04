@@ -25,6 +25,7 @@ import com.vaadin.ui.Upload.SucceededEvent;
 import com.vaadin.ui.Upload.SucceededListener;
 
 import life.qbic.charts.CpuHist;
+import life.qbic.charts.Download;
 import life.qbic.charts.CpuPerformance;
 import life.qbic.charts.Histogram;
 import com.vaadin.addon.charts.model.Configuration;
@@ -102,6 +103,7 @@ class UserInterfaceImpl implements UserInterface{
 		public void uploadSucceeded(SucceededEvent event) {
             fileNameLabel.setValue("Upload was successful.");
             chartArea.removeAllComponents();
+            
             boolean headerWritten = false;
             BufferedReader bfReader = new BufferedReader(new InputStreamReader(new ByteArrayInputStream(os.toByteArray())));
             try {
@@ -207,6 +209,8 @@ class UserInterfaceImpl implements UserInterface{
             taskList.forEach((Task task) -> xAxis.addCategory(task.getProcess()));
             config.addxAxis(xAxis);
             chartArea.addComponent(cpuPerformance);
+
+            mainBody.addComponent(new Download().createDownloadButton("CPU Performance SVG", cpuPerformance));
         }
 
         public boolean isNumeric(String str)  

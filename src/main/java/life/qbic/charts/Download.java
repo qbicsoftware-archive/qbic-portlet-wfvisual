@@ -11,16 +11,16 @@ import com.vaadin.server.StreamResource;
 import com.vaadin.server.StreamResource.StreamSource;
 import com.vaadin.ui.Button;
 
-class Download{
+public class Download{
 
     public Download(){}
 
-    Button createDownloadButton(String descriptor, Chart chart){
+    public Button createDownloadButton(String descriptor, Chart chart){
         Configuration conf = chart.getConfiguration();
         return createButton(descriptor, "chart.svg", createSVGStreamSource(conf));
     }
 
-    StreamSource createSVGStreamSource(Configuration conf){
+    private StreamSource createSVGStreamSource(Configuration conf){
         return new StreamSource(){
             @Override
             public InputStream getStream(){
@@ -31,7 +31,6 @@ class Download{
                 return null;
             }
         };
-        
     }
 
     private Button createButton(String descriptor, String filename, StreamSource ss){
