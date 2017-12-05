@@ -204,7 +204,7 @@ class UserInterfaceImpl implements UserInterface{
             taskList.sort(Comparator.comparing(Task::getProcess));
 
             ListSeries requestedCPU = new ListSeries();
-            requestedCPU.setName("Requested CPUs");
+            requestedCPU.setName("Remaining CPU resources");
             ListSeries usedCPU = new ListSeries();
             usedCPU.setName("Used CPUs");
             for(Task task : taskList){
