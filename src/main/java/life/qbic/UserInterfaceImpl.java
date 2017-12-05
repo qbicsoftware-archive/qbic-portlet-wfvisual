@@ -29,6 +29,10 @@ import life.qbic.charts.CpuHist;
 import life.qbic.charts.Download;
 import life.qbic.charts.CpuPerformance;
 import life.qbic.charts.Histogram;
+import life.qbic.charts.WallTimeChart;
+import org.joda.time.Period;
+import org.joda.time.format.PeriodFormatter;
+import org.joda.time.format.PeriodFormatterBuilder;
 import com.vaadin.addon.charts.model.Configuration;
 import com.vaadin.addon.charts.model.ListSeries;
 import com.vaadin.addon.charts.model.XAxis;
@@ -127,6 +131,7 @@ class UserInterfaceImpl implements UserInterface{
             InterfaceController iController = new InterfaceController();
             iController.loadCpuHistogram();
             iController.loadCpuPerformance();
+            iController.loadWallTimeChart();
         
         }
         
@@ -213,6 +218,66 @@ class UserInterfaceImpl implements UserInterface{
             chartArea.addComponent(cpuPerformance);
 
             mainBody.addComponent(new Download().createDownloadButton("CPU Performance SVG", cpuPerformance));
+        }
+
+
+        void loadWallTimeChart(){
+            List<Task> taskList = traceContainer.getTaskList();
+            
+            // Ensure that tasks are sorted by process
+            taskList.sort(Comparator.comparing(Task::getProcess));
+
+            List<Period> timePeriods = taskList.stream()
+                                .map(e -> parseRealtime(e.getRealtime()))
+                                .collect(Collectors.toList());
+
+            timePeriods.stream().forEach(e -> System.out.println(e.getMinutes()));
+
+            ListSeries realtime = new ListSeries();
+            realtime.setName("Real time used [minutes]");
+
+            Chart wallTimeChart = new WallTimeChart();
+            Configuration config = wallTimeChart.getConfiguration();
+        }
+
+
+        private Period parseRealtime(String s){
+            
+            PeriodFormatter formatter1 = new PeriodFormatterBuilder()
+                .appendDays().appendSuffix("d ")
+                .appendHours().appendSuffix("h ")
+                .appendMinutes().appendSuffix("m ")
+                .appendSeconds().appendSuffix("s ")
+                .toFormatter();
+            
+            PeriodFormatter formatter2 = new PeriodFormatterBuilder()
+            .appendHours().appendSuffix("h ")
+            .appendMinutes().appendSuffix("m ")
+            .appendSeconds().appendSuffix("s ")
+            .toFormatter();
+
+            PeriodFormatter formatter3 = new PeriodFormatterBuilder()
+            .appendMinutes().appendSuffix("m ")
+            .appendSeconds().appendSuffix("s")
+            .toFormatter();
+            
+            Period p = null;
+
+            try{
+                p = formatter1.parsePeriod(s);
+            } catch (Exception exc){
+                try {
+                    p = formatter2.parsePeriod(s);
+                } catch (Exception exc2){
+                    try {
+                        p = formatter3.parsePeriod(s);
+                    } catch (Exception exc3){
+                        p = formatter3.parsePeriod("0m 0s");
+                    }
+                }
+            }
+        
+            return p;
         }
 
         public boolean isNumeric(String str)  

@@ -21,7 +21,13 @@ class MappingInfo{
         map.put("hash", NextflowTraceColumns.HASH);
         map.put("native_id", NextflowTraceColumns.NATIVE_ID);
         map.put("process", NextflowTraceColumns.PROCESS);
+
         // ...
+        map.put("time", NextflowTraceColumns.TIME);
+        // ...
+        map.put("realtime", NextflowTraceColumns.REALTIME);
+        // ...
+
         map.put("cpus", NextflowTraceColumns.NAME.CPUS);
         map.put("memory", NextflowTraceColumns.MEMORY);
         // ...
