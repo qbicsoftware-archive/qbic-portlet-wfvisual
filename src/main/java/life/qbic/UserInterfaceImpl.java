@@ -124,15 +124,6 @@ class UserInterfaceImpl implements UserInterface{
                 exc.printStackTrace();
             }
 
-
-            Iterator<String[]> iterator = traceContainer.iterator();
-            while(iterator.hasNext()){
-                for(String value : iterator.next()){
-                    System.out.print(value + "\t");
-                }
-                System.out.print("\n");
-            }
-
             InterfaceController iController = new InterfaceController();
             iController.loadCpuHistogram();
             iController.loadCpuPerformance();
@@ -169,10 +160,8 @@ class UserInterfaceImpl implements UserInterface{
 
         void loadCpuHistogram(){
             Histogram hist = new Histogram();
-            List<String> tmp = traceContainer.getColumnValues("%cpu");
-            this.cpuUsage = tmp.stream().map(v -> v.replace("%", ""))
-                                                .filter(e -> isNumeric(e))
-                                                .map(Double::parseDouble)
+        
+            this.cpuUsage = traceContainer.getTaskList().stream().map(task -> task.getCpuUsed())
                                                 .collect(Collectors.toList());
             hist.setData(cpuUsage.toArray(new Double[cpuUsage.size()]));                            
             hist.compute();
@@ -194,7 +183,6 @@ class UserInterfaceImpl implements UserInterface{
         void loadCpuPerformance(){
             Chart cpuPerformance = new CpuPerformance();
             Configuration config = cpuPerformance.getConfiguration();
-            List<String> tmp = traceContainer.getColumnValues("cpus");
         
             List<Task> taskList = traceContainer.getTaskList().stream()
                                                 .filter(task -> task.getCpusRequested() > 1)

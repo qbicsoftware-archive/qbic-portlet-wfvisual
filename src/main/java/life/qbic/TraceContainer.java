@@ -5,97 +5,55 @@ import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
+import life.qbic.utils.NextflowColumnMapper;
+import life.qbic.utils.NextflowTraceColumns;
+
 import java.util.ArrayList;
 
-class TraceContainer implements Iterable<String[]>{
-
-    private Map<String, List<String>> traceTable;
-
-    private Map<Integer, String> traceColumnNoToName;
+class TraceContainer{
 
     private List<Task> taskList;
 
+    private NextflowColumnMapper columnMapper;
+
     public TraceContainer(){
-        traceTable = new HashMap<>();
-        traceColumnNoToName = new HashMap<>();
+        columnMapper = NextflowColumnMapper.getInstance();
         taskList = new ArrayList<>();
     }
 
     public void setTableHeader(String[] header){
-        int columnNumber = 0;
-        for (String columnName : header) {
-            traceColumnNoToName.put(columnNumber, columnName);
-            columnNumber++;
-        }
+        columnMapper.parseColumnsFromHeader(header);
     }
 
-    public void addTableRow(String[] row){
-        int currCol = 0;
-        for (String columnValue : row) {
-            String matchingColumn = traceColumnNoToName.get(currCol);
-            try {
-                traceTable.get(matchingColumn).add(columnValue);
-            }  catch (NullPointerException exc){
-                traceTable.put(matchingColumn, new ArrayList<>());
-                traceTable.get(matchingColumn).add(columnValue);
-            }
-            currCol++;
-        }
+    public void addTableRow(String[] row){              
         parseTask(row);
     }
 
 
     private void parseTask(String[] row){
         Task newTask = new Task();
-        newTask.setTaskId(Integer.parseInt(row[0]));
-        newTask.setCpusRequested(Integer.parseInt(row[7]));
-        newTask.setCpuUsed(Double.parseDouble(row[12].replace("%", ""))/100d);
-        newTask.setProcess(row[2]);
+        newTask.setTaskId(Integer.parseInt(getColFromRow(NextflowTraceColumns.TASK_ID, row)));
+        newTask.setCpusRequested(Integer.parseInt(getColFromRow(NextflowTraceColumns.CPUS, row)));
+        newTask.setCpuUsed(Double.parseDouble(getColFromRow(NextflowTraceColumns.P_CPU, row).replace("%", ""))/100d);
+        newTask.setProcess(getColFromRow(NextflowTraceColumns.PROCESS, row));
         taskList.add(newTask);
+    }
+
+    private String getColFromRow(NextflowTraceColumns col, String[] row){
+        int index = columnMapper.getColIndexForType(col);
+        return index != -1 ? row[index] : "";
     }
 
     public List<Task> getTaskList(){
         return this.taskList;
     }
 
-    public String[] getHeader(){
-        return (String []) this.traceColumnNoToName.values().toArray(new String[traceColumnNoToName.values().size()]);
+    public Set<NextflowTraceColumns> getHeader(){
+        return columnMapper.getHeader();
     }
 
-    public List<String> getColumnValues(String columnName){
-        return this.traceTable.get(columnName);
-    }
 
-	@Override
-	public Iterator<String[]> iterator() {
-
-        Iterator<String[]> it = new Iterator<String[]>() {
-            private int currentIndex = 0;
-            private boolean hasNext = true;
-
-			@Override
-			public boolean hasNext() {
-				return hasNext;
-			}
-
-			@Override
-			public String[] next() {
-                List<String> list = new ArrayList<>();
-                try {
-                    for (String col : traceColumnNoToName.values()){
-                        list.add((String) traceTable.get(col).get(currentIndex));
-                    }
-                } catch (IndexOutOfBoundsException exc){
-                    hasNext = false;
-                }
-                currentIndex++;
-				return (String[]) list.toArray(new String[list.size()]);
-			}
-        };
-
-        return it;
-
-	}
 
 
 

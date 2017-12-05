@@ -2,8 +2,9 @@ package life.qbic.utils;
 
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Set;
 
-life.qbic.utils.NextflowTraceColumns;
+import life.qbic.utils.NextflowTraceColumns;
 
 public class NextflowColumnMapper{
 
@@ -28,13 +29,33 @@ public class NextflowColumnMapper{
     }
 
     public NextflowColumnMapper parseColumnsFromHeader(String[] header){
-
+        int columnIndex = 0;
+        for (String col : header){
+            NextflowTraceColumns name = findCorrespondingColumn(col);
+            if(name != null)
+                this.columnMap.put(name, columnIndex);
+            columnIndex++;
+        }
         return this;
     }
 
-    private NextflowTraceColumns findCorrespondingColumn(String col){
-        
+    public Set<NextflowTraceColumns> getHeader(){
+        return this.columnMap.keySet();
     }
+
+    private NextflowTraceColumns findCorrespondingColumn(String col){
+        if (MappingInfo.map.keySet().contains(col)){
+            return MappingInfo.map.get(col);
+        } else {
+            return null;
+        }
+    }
+
+    public Integer getColIndexForType(NextflowTraceColumns col){
+        return columnMap.get(col);
+    }
+
+    
 
 
 
