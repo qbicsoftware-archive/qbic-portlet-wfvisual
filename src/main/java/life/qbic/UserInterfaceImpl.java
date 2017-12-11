@@ -38,6 +38,7 @@ import com.vaadin.addon.charts.model.Configuration;
 import com.vaadin.addon.charts.model.ListSeries;
 import com.vaadin.addon.charts.model.XAxis;
 import com.vaadin.addon.charts.model.YAxis;
+import com.vaadin.client.RenderInformation.Size;
 import com.vaadin.addon.charts.Chart;
 import com.vaadin.ui.Upload;
 
@@ -304,8 +305,9 @@ class UserInterfaceImpl implements UserInterface{
         private Map<String, Integer> computeSecondsPerProcess(Map<String, List<Period>> durationsPerProcess) {
             Map<String, Integer> secondsPerProcess = new HashMap<>();
             durationsPerProcess.forEach((process, periodList) -> {
+                int numberOfProcesses = (periodList.size() > 0) ? periodList.size() : 1;
                 secondsPerProcess.put(process, 
-                                    convertPeriodToSeconds(periodList.stream().reduce(new Period(0), (p0, p1) -> p0.plus(p1))));
+                                    convertPeriodToSeconds(periodList.stream().reduce(new Period(0), (p0, p1) -> p0.plus(p1)))/numberOfProcesses);
             });
 			return secondsPerProcess;
         }
