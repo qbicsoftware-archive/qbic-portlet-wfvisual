@@ -38,6 +38,7 @@ class TraceContainer{
         newTask.setCpuUsed(Double.parseDouble(getColFromRow(NextflowTraceColumns.P_CPU, row).replace("%", ""))/100d);
         newTask.setProcess(getColFromRow(NextflowTraceColumns.PROCESS, row));
         newTask.setRealtime(getColFromRow(NextflowTraceColumns.REALTIME, row));
+        newTask.setTime(getColFromRow(NextflowTraceColumns.TIME, row));
         taskList.add(newTask);
     }
 

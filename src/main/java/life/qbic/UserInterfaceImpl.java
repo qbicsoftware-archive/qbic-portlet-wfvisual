@@ -53,7 +53,7 @@ class UserInterfaceImpl implements UserInterface{
 
     HorizontalLayout uploadArea;
 
-    HorizontalLayout chartArea;
+    VerticalLayout chartArea;
 
     Upload fileUpload;
 
@@ -65,7 +65,7 @@ class UserInterfaceImpl implements UserInterface{
 
         mainBody = new VerticalLayout();
         uploadArea = new HorizontalLayout();
-        chartArea = new HorizontalLayout();
+        chartArea = new VerticalLayout();
 
         traceContainer = new TraceContainer();
 
@@ -132,7 +132,7 @@ class UserInterfaceImpl implements UserInterface{
             InterfaceController iController = new InterfaceController();
             iController.loadCpuHistogram();
             iController.loadCpuPerformance();
-            iController.loadWallTimeChart();
+            iController.loadWallTimeEffifiencyChart();
         
         }
         
@@ -221,10 +221,14 @@ class UserInterfaceImpl implements UserInterface{
             mainBody.addComponent(new Download().createDownloadButton("CPU Performance SVG", cpuPerformance));
         }
 
-
-        void loadWallTimeChart(){
+        /**
+         * A chart that visualizes the recorded walltime
+         * per process in comparison to the reserved cluster
+         * time per process. 
+         */
+        void loadWallTimeEffifiencyChart(){
             PeriodFormatTester pfTester = new PeriodFormatTester();
-
+            
             List<Task> taskList = traceContainer.getTaskList();
             
             // Ensure that tasks are sorted by process
@@ -247,19 +251,46 @@ class UserInterfaceImpl implements UserInterface{
             // Compute the total time per process
             Map<String, Integer> totalTimePerProcess = computeSecondsPerProcess(durationsPerProcess);
 
+            // Get the reserved time for each single job
+            Map<String, List<Period>> reservedTimePerProcess = new HashMap<>();
+            for (Task t : taskList) {
+                String process = t.getProcess();
+                Period p = pfTester.parseTime(t.getTime());
+                if (p == null)
+                    continue;
+                if (reservedTimePerProcess.get(process) == null){
+                    reservedTimePerProcess.put(process, new ArrayList<>());
+                } else {
+                    reservedTimePerProcess.get(process).add(p);
+                }
+            }
+
+            // Compute the total time per process
+            Map<String, Integer> totalReservedTimePerProcess = computeSecondsPerProcess(reservedTimePerProcess);
+            
+            
             // Fit the data into the chart
             ListSeries realtime = new ListSeries();
+            ListSeries reservedTime = new ListSeries();
             XAxis xAxis = new XAxis();
-            totalTimePerProcess.forEach((process, sumDuration) -> {realtime.addData(round(sumDuration/60.0, 2)); xAxis.addCategory(process);});
-            realtime.setName("Real time used [minutes]");
+            totalTimePerProcess.forEach((process, sumDuration) -> {
+                realtime.addData(round(sumDuration/60.0, 2));
+                reservedTime.addData(round(totalReservedTimePerProcess.get(process)/60.0, 2));
+                xAxis.addCategory(process);
+            });
 
-            Chart wallTimeChart = new WallTimeChart();
-            Configuration config = wallTimeChart.getConfiguration();
+            realtime.setName("Real time used [minutes]");
+            reservedTime.setName("Real time reserved [minutes]");
+
+            Chart walltimeEfficiency = new WallTimeChart();
+            Configuration config = walltimeEfficiency.getConfiguration();
             config.addxAxis(xAxis);
             config.addSeries(realtime);
+            config.addSeries(reservedTime);
 
-            chartArea.addComponent(wallTimeChart);
-        
+            chartArea.addComponent(walltimeEfficiency);
+
+
         }
 
         private double round(double value, int places) {

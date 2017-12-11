@@ -34,7 +34,11 @@ public class PeriodFormatTester {
                             .appendMinutes().appendSuffix("m ")
                             .appendSeconds().appendSuffix("s")
                             .toFormatter());
-        
+
+        formatterList.add(new PeriodFormatterBuilder()
+                            .appendHours().appendSuffix("h")
+                            .toFormatter());
+
         formatterList.add(new PeriodFormatterBuilder()
                             .appendMinutes().appendSuffix("m")
                             .toFormatter());

@@ -14,9 +14,7 @@ public class WallTimeChart extends Chart{
         this.getConfiguration().setSubTitle("Don't reserve to much resources!");
         this.getConfiguration().getChart().setZoomType(ZoomType.XY);
 
-        PlotOptionsSeries plot = new PlotOptionsSeries();
-        plot.setStacking(Stacking.NORMAL);
-        this.getConfiguration().setPlotOptions(plot);
+
     }
 
 }
