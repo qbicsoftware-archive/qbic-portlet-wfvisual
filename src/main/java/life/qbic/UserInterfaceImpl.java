@@ -11,12 +11,13 @@ import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.OutputStream;
-import java.util.Iterator;
+import java.math.BigDecimal;
+import java.math.RoundingMode;
 import java.util.List;
+import java.util.Map;
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.Comparator;
-import java.util.stream.Collector;
+import java.util.HashMap;
 import java.util.stream.Collectors;
 
 import com.vaadin.ui.Upload.FinishedEvent;
@@ -30,9 +31,9 @@ import life.qbic.charts.Download;
 import life.qbic.charts.CpuPerformance;
 import life.qbic.charts.Histogram;
 import life.qbic.charts.WallTimeChart;
+import life.qbic.utils.PeriodFormatTester;
+
 import org.joda.time.Period;
-import org.joda.time.format.PeriodFormatter;
-import org.joda.time.format.PeriodFormatterBuilder;
 import com.vaadin.addon.charts.model.Configuration;
 import com.vaadin.addon.charts.model.ListSeries;
 import com.vaadin.addon.charts.model.XAxis;
@@ -222,65 +223,67 @@ class UserInterfaceImpl implements UserInterface{
 
 
         void loadWallTimeChart(){
+            PeriodFormatTester pfTester = new PeriodFormatTester();
+
             List<Task> taskList = traceContainer.getTaskList();
             
             // Ensure that tasks are sorted by process
             taskList.sort(Comparator.comparing(Task::getProcess));
 
-            List<Period> timePeriods = taskList.stream()
-                                .map(e -> parseRealtime(e.getRealtime()))
-                                .collect(Collectors.toList());
+            // Retrieve the duration times per process
+            Map<String, List<Period>> durationsPerProcess = new HashMap<>();
+            for (Task t : taskList) {
+                String process = t.getProcess();
+                Period p = pfTester.parseTime(t.getRealtime());
+                if (p == null)
+                    continue;
+                if (durationsPerProcess.get(process) == null){
+                    durationsPerProcess.put(process, new ArrayList<>());
+                } else {
+                    durationsPerProcess.get(process).add(p);
+                }
+            }
 
-            timePeriods.stream().forEach(e -> System.out.println(e.getMinutes()));
+            // Compute the total time per process
+            Map<String, Integer> totalTimePerProcess = computeSecondsPerProcess(durationsPerProcess);
 
+            // Fit the data into the chart
             ListSeries realtime = new ListSeries();
+            XAxis xAxis = new XAxis();
+            totalTimePerProcess.forEach((process, sumDuration) -> {realtime.addData(round(sumDuration/60.0, 2)); xAxis.addCategory(process);});
             realtime.setName("Real time used [minutes]");
 
             Chart wallTimeChart = new WallTimeChart();
             Configuration config = wallTimeChart.getConfiguration();
-        }
+            config.addxAxis(xAxis);
+            config.addSeries(realtime);
 
-
-        private Period parseRealtime(String s){
-            
-            PeriodFormatter formatter1 = new PeriodFormatterBuilder()
-                .appendDays().appendSuffix("d ")
-                .appendHours().appendSuffix("h ")
-                .appendMinutes().appendSuffix("m ")
-                .appendSeconds().appendSuffix("s ")
-                .toFormatter();
-            
-            PeriodFormatter formatter2 = new PeriodFormatterBuilder()
-            .appendHours().appendSuffix("h ")
-            .appendMinutes().appendSuffix("m ")
-            .appendSeconds().appendSuffix("s ")
-            .toFormatter();
-
-            PeriodFormatter formatter3 = new PeriodFormatterBuilder()
-            .appendMinutes().appendSuffix("m ")
-            .appendSeconds().appendSuffix("s")
-            .toFormatter();
-            
-            Period p = null;
-
-            try{
-                p = formatter1.parsePeriod(s);
-            } catch (Exception exc){
-                try {
-                    p = formatter2.parsePeriod(s);
-                } catch (Exception exc2){
-                    try {
-                        p = formatter3.parsePeriod(s);
-                    } catch (Exception exc3){
-                        p = formatter3.parsePeriod("0m 0s");
-                    }
-                }
-            }
+            chartArea.addComponent(wallTimeChart);
         
-            return p;
         }
 
-        public boolean isNumeric(String str)  
+        private double round(double value, int places) {
+            if (places < 0) throw new IllegalArgumentException();
+        
+            BigDecimal bd = new BigDecimal(value);
+            bd = bd.setScale(places, RoundingMode.HALF_UP);
+            return bd.doubleValue();
+        }
+
+        private Map<String, Integer> computeSecondsPerProcess(Map<String, List<Period>> durationsPerProcess) {
+            Map<String, Integer> secondsPerProcess = new HashMap<>();
+            durationsPerProcess.forEach((process, periodList) -> {
+                secondsPerProcess.put(process, 
+                                    convertPeriodToSeconds(periodList.stream().reduce(new Period(0), (p0, p1) -> p0.plus(p1))));
+            });
+			return secondsPerProcess;
+        }
+        
+        private Integer convertPeriodToSeconds(Period p){
+            return p.getDays()*24*60*60 + p.getHours()*60*60 + p.getMinutes()*60 + p.getSeconds();
+        }
+
+		public boolean isNumeric(String str)  
         {  
           try  
           {  
@@ -292,7 +295,6 @@ class UserInterfaceImpl implements UserInterface{
           }  
           return true;  
         }
-
 
         private List<Double> computeLogRatios (List<Double> oneList, List<Double> anotherList){
             List<Double> logRatios = new ArrayList<>();
