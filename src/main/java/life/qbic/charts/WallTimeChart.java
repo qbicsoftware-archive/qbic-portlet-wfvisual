@@ -9,7 +9,7 @@ import com.vaadin.addon.charts.model.ZoomType;
 public class WallTimeChart extends Chart{
 
     public WallTimeChart(){
-        super(ChartType.BAR);
+        super(ChartType.COLUMN);
         this.getConfiguration().setTitle("Walltime Overview");
         this.getConfiguration().setSubTitle("Don't reserve to much resources!");
         this.getConfiguration().getChart().setZoomType(ZoomType.XY);

@@ -6,7 +6,7 @@ import com.vaadin.addon.charts.model.ChartType;
 public class CpuHist extends Chart{
 
     public CpuHist(){
-        super(ChartType.BAR);
+        super(ChartType.COLUMN);
         this.getConfiguration().setTitle("Histogram of CPU time");
         this.getConfiguration().setSubTitle("This rocks!");
     }

@@ -9,7 +9,7 @@ import com.vaadin.addon.charts.model.ZoomType;
 public class CpuPerformance extends Chart{
 
     public CpuPerformance(){
-        super(ChartType.BAR);
+        super(ChartType.COLUMN);
         this.getConfiguration().setTitle("CPU Usage");
         this.getConfiguration().setSubTitle("Don't reserve to much resources!");
         this.getConfiguration().getChart().setZoomType(ZoomType.XY);
