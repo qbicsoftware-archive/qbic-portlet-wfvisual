@@ -1,5 +1,6 @@
 package life.qbic;
 
+import com.vaadin.ui.Button;
 import com.vaadin.ui.HorizontalLayout;
 import com.vaadin.ui.Label;
 import com.vaadin.ui.UI;
@@ -40,6 +41,8 @@ import com.vaadin.addon.charts.model.XAxis;
 import com.vaadin.addon.charts.model.YAxis;
 import com.vaadin.client.RenderInformation.Size;
 import com.vaadin.addon.charts.Chart;
+import com.vaadin.addon.charts.PointClickEvent;
+import com.vaadin.addon.charts.PointClickListener;
 import com.vaadin.ui.Upload;
 
 /**
@@ -166,6 +169,7 @@ class UserInterfaceImpl implements UserInterface{
         InterfaceController(){}
 
         void loadCpuHistogram(){
+            VerticalLayout container = new VerticalLayout();
             Histogram hist = new Histogram();
         
             this.cpuUsage = traceContainer.getTaskList().stream().map(task -> task.getCpuUsed())
@@ -183,11 +187,16 @@ class UserInterfaceImpl implements UserInterface{
                 list.addData(count);
             }
             config.addSeries(list);
-            chartArea.addComponent(cpuHist);
+           
+            container.addComponent(cpuHist);
+            Button downloadButton = new Download().createDownloadButton("Get Chart as SVG", cpuHist);
+            container.addComponent(downloadButton);
+            chartArea.addComponent(container);
             
         }
 
         void loadCpuPerformance(){
+            VerticalLayout container = new VerticalLayout();
             Chart cpuPerformance = new CpuPerformance();
             Configuration config = cpuPerformance.getConfiguration();
         
@@ -217,9 +226,11 @@ class UserInterfaceImpl implements UserInterface{
             taskList.forEach((Task task) -> xAxis.addCategory(task.getProcess()));
             config.addxAxis(xAxis);
             config.addyAxis(yAxis);
-            chartArea.addComponent(cpuPerformance);
 
-            mainBody.addComponent(new Download().createDownloadButton("CPU Performance SVG", cpuPerformance));
+            container.addComponent(cpuPerformance);
+            Button downloadButton = new Download().createDownloadButton("Get Chart as SVG", cpuPerformance);
+            container.addComponent(downloadButton);
+            chartArea.addComponent(container);
         }
 
         /**
@@ -228,6 +239,7 @@ class UserInterfaceImpl implements UserInterface{
          * time per process. 
          */
         void loadWallTimeEffifiencyChart(){
+            VerticalLayout container = new VerticalLayout();
             PeriodFormatTester pfTester = new PeriodFormatTester();
             
             List<Task> taskList = traceContainer.getTaskList();
@@ -274,6 +286,7 @@ class UserInterfaceImpl implements UserInterface{
             ListSeries realtime = new ListSeries();
             ListSeries reservedTime = new ListSeries();
             XAxis xAxis = new XAxis();
+            YAxis yAxis = new YAxis();
             totalTimePerProcess.forEach((process, sumDuration) -> {
                 realtime.addData(round(sumDuration/60.0, 2));
                 reservedTime.addData(round(totalReservedTimePerProcess.get(process)/60.0, 2));
@@ -282,14 +295,19 @@ class UserInterfaceImpl implements UserInterface{
 
             realtime.setName("Real time used [minutes]");
             reservedTime.setName("Real time reserved [minutes]");
+            yAxis.setTitle("Duration (minutes)");
 
             Chart walltimeEfficiency = new WallTimeChart();
             Configuration config = walltimeEfficiency.getConfiguration();
             config.addxAxis(xAxis);
+            config.addyAxis(yAxis);
             config.addSeries(realtime);
             config.addSeries(reservedTime);
 
-            chartArea.addComponent(walltimeEfficiency);
+            container.addComponent(walltimeEfficiency);
+            Button downloadButton = new Download().createDownloadButton("Get Chart as SVG", walltimeEfficiency);
+            container.addComponent(downloadButton);
+            chartArea.addComponent(container);
 
 
         }
