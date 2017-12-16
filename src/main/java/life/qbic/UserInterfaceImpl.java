@@ -189,7 +189,7 @@ class UserInterfaceImpl implements UserInterface{
             config.addSeries(list);
            
             container.addComponent(cpuHist);
-            Button downloadButton = new Download().createDownloadButton("Get Chart as SVG", cpuHist);
+            Button downloadButton = new Download().createDownloadButton("Get Chart as SVG", "cpu_histogram", cpuHist);
             container.addComponent(downloadButton);
             chartArea.addComponent(container);
             
@@ -228,7 +228,7 @@ class UserInterfaceImpl implements UserInterface{
             config.addyAxis(yAxis);
 
             container.addComponent(cpuPerformance);
-            Button downloadButton = new Download().createDownloadButton("Get Chart as SVG", cpuPerformance);
+            Button downloadButton = new Download().createDownloadButton("Get Chart as SVG", "cpu_performance", cpuPerformance);
             container.addComponent(downloadButton);
             chartArea.addComponent(container);
         }
@@ -305,7 +305,7 @@ class UserInterfaceImpl implements UserInterface{
             config.addSeries(reservedTime);
 
             container.addComponent(walltimeEfficiency);
-            Button downloadButton = new Download().createDownloadButton("Get Chart as SVG", walltimeEfficiency);
+            Button downloadButton = new Download().createDownloadButton("Get Chart as SVG", "walltime_efficiency", walltimeEfficiency);
             container.addComponent(downloadButton);
             chartArea.addComponent(container);
 

@@ -15,9 +15,9 @@ public class Download{
 
     public Download(){}
 
-    public Button createDownloadButton(String descriptor, Chart chart){
+    public Button createDownloadButton(String descriptor, String filename, Chart chart){
         Configuration conf = chart.getConfiguration();
-        return createButton(descriptor, "chart.svg", createSVGStreamSource(conf));
+        return createButton(descriptor, filename+".svg", createSVGStreamSource(conf));
     }
 
     private StreamSource createSVGStreamSource(Configuration conf){
