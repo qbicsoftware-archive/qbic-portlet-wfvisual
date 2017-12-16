@@ -14787,3 +14787,8 @@ div.v-layout.v-horizontal.v-widget {
 .mytheme .textfield-green {
 	background: green;
 }
+
+.mytheme .chart-area {
+	max-width: 800px;
+	width: 100%;
+}

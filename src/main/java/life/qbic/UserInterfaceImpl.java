@@ -1,5 +1,6 @@
 package life.qbic;
 
+import com.vaadin.ui.Alignment;
 import com.vaadin.ui.Button;
 import com.vaadin.ui.HorizontalLayout;
 import com.vaadin.ui.Label;
@@ -84,8 +85,10 @@ class UserInterfaceImpl implements UserInterface{
         
         uploadArea.addComponent(fileUpload);
         chartArea.addComponent(fileNameLabel);
+        chartArea.setStyleName("chart-area");
         
         mainBody.addComponents(uploadArea, chartArea);
+        mainBody.setComponentAlignment(chartArea, Alignment.TOP_CENTER);
 
 
     }
